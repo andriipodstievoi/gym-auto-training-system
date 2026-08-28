@@ -1,5 +1,7 @@
 # SPĒKS — Gym & Automatic Training System
 
+[![CI](https://github.com/andriipodstievoi/gym-auto-training-system/actions/workflows/ci.yml/badge.svg)](https://github.com/andriipodstievoi/gym-auto-training-system/actions/workflows/ci.yml)
+
 A full-stack website for a strength gym in **Rīga, Latvia**: find a branch, buy a
 membership, book a trainer, order kit and supplements — and complete an assessment
 that generates a **personal, periodised training programme**.
