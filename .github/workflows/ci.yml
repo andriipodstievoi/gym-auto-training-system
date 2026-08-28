@@ -20,7 +20,7 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up PHP 8.3
         uses: shivammathur/setup-php@v2
@@ -31,7 +31,7 @@ jobs:
           tools: composer:v2
 
       - name: Cache Composer packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: composer-${{ hashFiles('app/composer.lock') }}
@@ -55,7 +55,7 @@ jobs:
         run: vendor/bin/phpstan analyse --no-progress
 
       - name: Cache Tailwind binary
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: app/var/tailwind
           key: tailwind-v4.3.3-${{ runner.os }}
@@ -73,10 +73,10 @@ jobs:
       run:
         working-directory: ai-service
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python 3.14
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.14'
           cache: pip
@@ -98,7 +98,7 @@ jobs:
     name: Docker · images build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 

@@ -1,6 +1,8 @@
 {
+    "name": "andriipodstievoi/speks-gym",
+    "description": "Gym website and automatic training system for a strength gym in Riga, Latvia.",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
