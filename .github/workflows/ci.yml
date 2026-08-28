@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php:
+    name: PHP · Symfony
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, zip, pdo_mysql, redis, apcu, opcache
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('app/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Check code style
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+        env:
+          PHP_CS_FIXER_IGNORE_ENV: 1
+
+      - name: Warm cache (PHPStan reads the compiled container)
+        run: bin/console cache:warmup --env=dev
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Cache Tailwind binary
+        uses: actions/cache@v4
+        with:
+          path: app/var/tailwind
+          key: tailwind-v4.3.3-${{ runner.os }}
+
+      - name: Build CSS
+        run: bin/console tailwind:build --minify
+
+      - name: Tests
+        run: bin/phpunit
+
+  python:
+    name: Python · ai-service
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-service
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+          cache-dependency-path: ai-service/requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Tests
+        run: pytest -q
+
+  docker:
+    name: Docker · images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the stack
+        run: docker compose -f infra/compose.yaml build
+
+      - name: Validate the compose file
+        run: docker compose -f infra/compose.yaml config --quiet

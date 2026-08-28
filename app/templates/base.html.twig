@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}" class="h-full">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}{{ 'brand.name'|trans }}{% endblock %}</title>
+        <meta name="description" content="{% block description %}{{ 'brand.tagline'|trans }}{% endblock %}">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.05em%22 font-size=%22104%22>🏋️</text></svg>">
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body class="h-full bg-iron-900 text-iron-100 antialiased">
+        {% block header %}{% include 'partials/_header.html.twig' %}{% endblock %}
+
+        <main>{% block body %}{% endblock %}</main>
+
+        {% block footer %}{% include 'partials/_footer.html.twig' %}{% endblock %}
+    </body>
+</html>

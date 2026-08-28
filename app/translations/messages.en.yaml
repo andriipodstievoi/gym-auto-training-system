@@ -1,0 +1,44 @@
+brand:
+    name: SPĒKS
+    tagline: "Riga's strength gym — train with a plan, not a guess."
+
+nav:
+    map: Map
+    memberships: Memberships
+    trainers: Trainers
+    shop: Shop
+    quiz: Get your plan
+    menu: Menu
+    soon: Coming soon
+
+home:
+    hero:
+        kicker: "Rīga · Latvia"
+        title: "Train with a plan built around you"
+        lead: "Answer a short assessment. Get a periodised programme matched to your goal, your schedule, the equipment you actually have, and the injuries you actually carry."
+        cta: "Start the assessment"
+        secondary: "See memberships"
+    features:
+        title: "What this gym does online"
+        map:
+            title: "Gym map"
+            text: "Find our Riga branches, opening hours, and a clickable floor plan of every equipment zone."
+        memberships:
+            title: "Memberships"
+            text: "Monthly and yearly plans in EUR, paid by card, managed from your account."
+        trainers:
+            title: "Trainers"
+            text: "Browse coaches by speciality and language, then book a session or message them directly."
+        shop:
+            title: "Shop"
+            text: "Training clothes and supplements — protein, creatine, accessories — delivered across Latvia."
+        plan:
+            title: "Automatic training system"
+            text: "The assessment feeds a programme generator: split, volume, progression and exercise selection, all computed for you."
+    status:
+        title: "Build status"
+        lead: "This is milestone M0 — the foundation is live and every feature below is scheduled."
+
+footer:
+    address: "Rīga, Latvia"
+    disclaimer: "Training plans are general fitness guidance, not medical advice."

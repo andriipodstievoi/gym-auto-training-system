@@ -1,0 +1,22 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    default_locale: '%env(DEFAULT_LOCALE)%'
+    enabled_locales: ['en', 'lv', 'ru']
+
+    session:
+        # Sessions live in Redis so the app stays stateless behind a load balancer.
+        handler_id: '%env(REDIS_URL)%'
+        cookie_secure: auto
+        cookie_samesite: lax
+
+    http_client:
+        scoped_clients:
+            ai_service.client:
+                base_uri: '%env(AI_SERVICE_URL)%'
+                timeout: '%env(float:AI_SERVICE_TIMEOUT)%'
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file

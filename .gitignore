@@ -1,0 +1,39 @@
+# --- Symfony (app/) ---
+/app/vendor/
+/app/var/
+/app/.env.local
+/app/.env.*.local
+/app/public/bundles/
+/app/public/assets/
+/app/config/secrets/prod/prod.decrypt.private.php
+/app/.php-cs-fixer.cache
+/app/.phpunit.result.cache
+/app/phpstan.neon.local
+
+# --- Node (Tailwind build) ---
+node_modules/
+/app/node_modules/
+
+# --- Python (ai-service/) ---
+/ai-service/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# --- Secrets ---
+.env.local
+*.local.env
+!/.env.example
+
+# --- Editors / OS ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Build output ---
+/docs/coverage/

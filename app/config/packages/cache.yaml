@@ -1,0 +1,19 @@
+framework:
+    cache:
+        # Redis-backed application cache (native php-redis extension).
+        app: cache.adapter.redis
+        default_redis_provider: '%env(REDIS_URL)%'
+
+        # Compiled metadata stays on the filesystem/APCu - it must survive a Redis flush.
+        system: cache.adapter.system
+
+        pools:
+            doctrine.result_cache_pool:
+                adapter: cache.app
+            doctrine.system_cache_pool:
+                adapter: cache.system
+
+when@test:
+    framework:
+        cache:
+            app: cache.adapter.array

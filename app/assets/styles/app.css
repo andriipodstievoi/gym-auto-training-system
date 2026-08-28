@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+/* Tailwind v4 scans these for class names. */
+@source "../../templates/**/*.twig";
+@source "../**/*.js";
+
+@theme {
+    /* Gym brand palette - iron greys with a signal-orange accent. */
+    --color-iron-50:  #f6f7f8;
+    --color-iron-100: #e9ebee;
+    --color-iron-200: #cfd4da;
+    --color-iron-400: #8a929d;
+    --color-iron-600: #4b535e;
+    --color-iron-800: #23282f;
+    --color-iron-900: #14171b;
+
+    --color-signal-400: #ff9d3d;
+    --color-signal-500: #f97316;
+    --color-signal-600: #dd5f06;
+
+    --font-display: "Bebas Neue", "Arial Narrow", sans-serif;
+}
+
+/* Alpine: hide elements until Alpine has initialised. */
+[x-cloak] { display: none !important; }

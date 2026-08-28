@@ -1,0 +1,4 @@
+symfonycasts_tailwind:
+    # Pinned so local builds and CI produce identical CSS.
+    binary_version: 'v4.3.3'
+    process_timeout: 300

@@ -1,0 +1,8 @@
+<div class="flex gap-1 text-xs font-semibold uppercase">
+    {% for locale in ['en', 'lv', 'ru'] %}
+        <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({_locale: locale})) }}"
+           class="rounded px-2 py-1 {{ app.request.locale == locale ? 'bg-signal-500 text-iron-900' : 'text-iron-400 hover:text-white' }}">
+            {{ locale }}
+        </a>
+    {% endfor %}
+</div>

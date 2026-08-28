@@ -1,0 +1,44 @@
+brand:
+    name: SPĒKS
+    tagline: "Rīgas spēka zāle — trenējies pēc plāna, nevis pēc nojautas."
+
+nav:
+    map: Karte
+    memberships: Abonementi
+    trainers: Treneri
+    shop: Veikals
+    quiz: Saņem savu plānu
+    menu: Izvēlne
+    soon: Drīzumā
+
+home:
+    hero:
+        kicker: "Rīga · Latvija"
+        title: "Trenējies pēc plāna, kas veidots tieši tev"
+        lead: "Atbildi uz īsu anketu. Saņem periodizētu programmu, kas pielāgota tavam mērķim, grafikam, pieejamajam inventāram un traumām."
+        cta: "Sākt anketu"
+        secondary: "Apskatīt abonementus"
+    features:
+        title: "Ko šī zāle piedāvā tiešsaistē"
+        map:
+            title: "Zāles karte"
+            text: "Atrodi mūsu filiāles Rīgā, darba laikus un interaktīvu zāles plānu ar visām treniņu zonām."
+        memberships:
+            title: "Abonementi"
+            text: "Mēneša un gada plāni eiro, apmaksa ar karti, pārvaldība savā kontā."
+        trainers:
+            title: "Treneri"
+            text: "Izvēlies treneri pēc specialitātes un valodas, piesaki nodarbību vai raksti viņam tieši."
+        shop:
+            title: "Veikals"
+            text: "Treniņu apģērbs un uztura bagātinātāji — proteīns, kreatīns, aksesuāri — ar piegādi visā Latvijā."
+        plan:
+            title: "Automātiskā treniņu sistēma"
+            text: "Anketa nonāk programmas ģeneratorā: sadalījums, apjoms, progresija un vingrinājumu izvēle tiek aprēķināti tev."
+    status:
+        title: "Izstrādes statuss"
+        lead: "Šis ir M0 posms — pamati ir gatavi, un katra funkcija zemāk ir ieplānota."
+
+footer:
+    address: "Rīga, Latvija"
+    disclaimer: "Treniņu plāni ir vispārīgi fitnesa ieteikumi, nevis medicīnisks padoms."
