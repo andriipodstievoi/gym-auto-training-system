@@ -40,6 +40,7 @@ loads. The site produces valid programmes with no API key configured.
 | Layer | Technology |
 |---|---|
 | Backend | PHP 8.3, Symfony 7.4 LTS, Doctrine ORM, Twig |
+| Back office | EasyAdmin 5 |
 | Frontend | Tailwind CSS 4, Alpine.js 3, Symfony AssetMapper (no bundler) |
 | Data | MySQL 8.4, Redis 7 (cache + sessions) |
 | Plans | Python 3.14, FastAPI, Pydantic v2 |
@@ -57,7 +58,7 @@ loads. The site produces valid programmes with no API key configured.
 | | Milestone | Status |
 |---|---|---|
 | **M0** | Foundation — framework, assets, i18n, Docker, CI | ✅ done |
-| M1 | Domain model, migrations, fixtures, back office | planned |
+| **M1** | Domain model, migrations, fixtures, back office | ✅ done |
 | M2 | Public site, Leaflet branch map, SVG floor plan | planned |
 | M3 | Accounts, memberships, Stripe test checkout | planned |
 | M4 | Shop — catalogue, cart, orders | planned |
@@ -89,17 +90,28 @@ PHP, MySQL and Redis come from Laragon and are **not on `PATH`** — call them b
 full path, or add `C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64` and
 `C:\laragon\bin\symfony` to `PATH`.
 
-Start MySQL, Redis and Mailpit (Laragon → *Start All*), then build the CSS:
+Start MySQL, Redis and Mailpit (Laragon → *Start All*), then create the schema
+and seed it:
+
+```bash
+cd app && php bin/console doctrine:migrations:migrate && php bin/console doctrine:fixtures:load
+```
+
+Build the CSS:
 
 ```bash
 cd app && php bin/console tailwind:build --watch
 ```
 
-Serve the site:
+Serve the site with the Symfony CLI:
 
 ```bash
-cd app && php -S 127.0.0.1:8000 -t public public/index.php
+cd app && symfony server:start --no-tls --port=8000
 ```
+
+Use `symfony server:start`, not `php -S`. The PHP built-in server sends static
+files under `public/bundles/` as `text/html`, so the browser refuses the
+EasyAdmin stylesheet and the back office renders unstyled.
 
 Serve the plan service:
 
@@ -108,6 +120,17 @@ cd ai-service && .venv/Scripts/uvicorn app.main:app --reload --port 8001
 ```
 
 The site is then on http://127.0.0.1:8000 and redirects `/` to `/en`.
+
+### Back office
+
+http://127.0.0.1:8000/admin — branches, floor zones, equipment, membership
+plans, trainers, the shop catalogue and the exercise library, each with
+per-locale inputs for translated fields.
+
+It is currently behind HTTP basic auth against a single in-memory account
+(`admin` / `speks-dev`), defined in `config/packages/security.yaml`. That is a
+**placeholder**: M3 replaces it with real accounts and roles. Override
+`ADMIN_PASSWORD_HASH` anywhere this is not a local machine.
 
 ### Required PHP extensions
 
@@ -144,6 +167,12 @@ cd app && vendor/bin/phpstan analyse
 
 ```bash
 cd app && bin/phpunit
+```
+
+The repository tests need a seeded test database:
+
+```bash
+cd app && php bin/console doctrine:migrations:migrate --env=test --no-interaction && php bin/console doctrine:fixtures:load --env=test --no-interaction
 ```
 
 ```bash

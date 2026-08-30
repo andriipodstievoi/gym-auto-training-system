@@ -19,6 +19,22 @@ jobs:
     defaults:
       run:
         working-directory: app
+    env:
+      # Overrides the local default in app/.env for the CI service container.
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/gym_app?serverVersion=8.4.3-mysql&charset=utf8mb4"
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: gym_app
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - uses: actions/checkout@v7
 
@@ -62,6 +78,12 @@ jobs:
 
       - name: Build CSS
         run: bin/console tailwind:build --minify
+
+      - name: Prepare the test database
+        run: |
+          bin/console doctrine:database:create --env=test --if-not-exists
+          bin/console doctrine:migrations:migrate --env=test --no-interaction
+          bin/console doctrine:fixtures:load --env=test --no-interaction
 
       - name: Tests
         run: bin/phpunit

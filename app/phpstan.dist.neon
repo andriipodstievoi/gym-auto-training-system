@@ -11,3 +11,15 @@ parameters:
         - tests
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
+    ignoreErrors:
+        # The owning side of these associations is NOT NULL in the database, which
+        # is correct: a floor zone always belongs to a branch and a piece of
+        # equipment always sits in a zone. The PHP property stays nullable purely
+        # so the bidirectional remove helpers can detach before orphan removal.
+        -
+            identifier: doctrine.associationType
+            path: src/Entity/FloorZone.php
+        -
+            identifier: doctrine.associationType
+            path: src/Entity/Equipment.php
