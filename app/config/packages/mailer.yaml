@@ -1,3 +1,11 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+
+when@test:
+    framework:
+        mailer:
+            # Tests must not need an SMTP server listening. The null transport
+            # still fires the mailer's events, so assertEmailCount and friends
+            # see every message - they just never reach a socket.
+            dsn: 'null://null'

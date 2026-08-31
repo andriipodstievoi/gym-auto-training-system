@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Bundle\FrameworkBundle\Test\MailerAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -18,6 +19,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 final class SecurityControllerTest extends WebTestCase
 {
+    use MailerAssertionsTrait;
+
     private const string FIXTURE_PASSWORD = 'speks-dev';
 
     /**
@@ -73,6 +76,14 @@ final class SecurityControllerTest extends WebTestCase
         ]));
 
         self::assertResponseRedirects('/en/account');
+
+        // Asserted before the redirect is followed: the kernel reboots between
+        // requests, and the collected mailer events go with it.
+        self::assertEmailCount(1);
+        $email = self::getMailerMessage();
+        self::assertNotNull($email);
+        self::assertEmailHeaderSame($email, 'To', 'Elza Liepa <elza'.self::SCRATCH_DOMAIN.'>');
+        self::assertEmailHeaderSame($email, 'Subject', 'Welcome to SPĒKS');
 
         $user = self::userRepository()->findOneByEmail('elza'.self::SCRATCH_DOMAIN);
         self::assertInstanceOf(User::class, $user);
