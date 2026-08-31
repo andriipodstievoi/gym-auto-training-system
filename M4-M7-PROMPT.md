@@ -1,11 +1,28 @@
 # M4 → M7: shop, booking, the training-plan generator, hardening
 
+## The goal
+
+Ship M4, M5, M6 and M7. **Stop only when every one of these is true:**
+
+1. Each of M4, M5, M6 and M7 is committed as `Mx: subject` and pushed to `main`.
+2. `gh run watch` reports CI green on the most recent push.
+3. All four quality gates pass locally (see *Definition of done* below).
+4. The status tables in `CLAUDE.md` and `README.md` show M4–M7 as done.
+
+Anything less is not done. Finishing M4 is not finishing — continue straight
+into M5, then M6, then M7. If one milestone turns out to be blocked, complete
+every other one in full and say plainly which part you left and why.
+
 Read `CLAUDE.md` first. It is the source of truth for the toolchain, the
 conventions and the gotchas already paid for.
 
 You are the **lead** on this run, not the only worker. Delegate implementation
-to subagents and keep the serialising work for yourself. Do not stop after M4 —
-finish it, then move to M5, M6 and M7 in order.
+to subagents and keep the serialising work for yourself.
+
+**Resuming:** this may re-enter mid-run. Before starting anything, check
+`git log --oneline -8` and the status tables in `CLAUDE.md` to see which
+milestones already landed, and pick up from the first one that has not. Never
+redo a milestone that is already committed and green.
 
 ## Before you write any code
 
