@@ -125,8 +125,9 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   use `Exception\InvalidType::new()` and `Exception\ValueNotConvertible::new()`.
 - Symfony **8 requires PHP 8.4**, so this project stays on **7.4 LTS**.
 - Files committed from Windows need `git update-index --chmod=+x` for anything Linux CI executes.
-- The repo lives inside **OneDrive**, so `vendor/`, `.venv/` and the 107 MB Tailwind binary in
-  `app/var/` all sync. Moving it to e.g. `C:\dev\gym-proj` would avoid the churn.
+- The working copy lives at **`C:\dev\gym-proj`**, deliberately outside OneDrive — `vendor/`,
+  `.venv/` and the 107 MB Tailwind binary in `app/var/` come to ~350 MB and used to sync on
+  every build. Do not move it back under `OneDrive\Desktop`.
 
 ## Status
 
