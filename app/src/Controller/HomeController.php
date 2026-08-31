@@ -36,9 +36,9 @@ final class HomeController extends AbstractController
     private const MILESTONES = [
         ['id' => 'M0', 'title' => 'Foundation', 'done' => true,
             'detail' => 'Symfony 7.4 LTS, Tailwind 4, Alpine, MySQL, Redis, EN/LV/RU routing, Docker and CI.'],
-        ['id' => 'M1', 'title' => 'Domain model & admin', 'done' => false,
+        ['id' => 'M1', 'title' => 'Domain model & admin', 'done' => true,
             'detail' => 'Entities, migrations, fixtures and a back office for branches, plans, products and trainers.'],
-        ['id' => 'M2', 'title' => 'Public site & gym map', 'done' => false,
+        ['id' => 'M2', 'title' => 'Public site & gym map', 'done' => true,
             'detail' => 'Branch pages, a Leaflet map of Riga locations, and a clickable SVG floor plan.'],
         ['id' => 'M3', 'title' => 'Accounts & memberships', 'done' => false,
             'detail' => 'Registration, login, membership tiers and Stripe test-mode checkout with webhooks.'],

@@ -18,6 +18,7 @@ home:
         lead: "Answer a short assessment. Get a periodised programme matched to your goal, your schedule, the equipment you actually have, and the injuries you actually carry."
         cta: "Start the assessment"
         secondary: "See memberships"
+        branches: "Find a branch"
     features:
         title: "What this gym does online"
         map:
@@ -37,8 +38,101 @@ home:
             text: "The assessment feeds a programme generator: split, volume, progression and exercise selection, all computed for you."
     status:
         title: "Build status"
-        lead: "This is milestone M0 — the foundation is live and every feature below is scheduled."
+        lead: "The public site is live through M2. Everything still marked planned is scheduled."
 
 footer:
     address: "Rīga, Latvia"
     disclaimer: "Training plans are general fitness guidance, not medical advice."
+
+weekday:
+    '1': Mon
+    '2': Tue
+    '3': Wed
+    '4': Thu
+    '5': Fri
+    '6': Sat
+    '7': Sun
+
+branch:
+    index:
+        kicker: "Rīga · three locations"
+        title: "Find your branch"
+        lead: "Every SPĒKS floor: where it is, when it opens, and exactly what stands on it."
+        heading: "All branches"
+    map:
+        hint: "Pick a pin for opening hours and a way through to the branch."
+        today: "Today"
+        open_now: "Open now"
+        closed_now: "Closed right now"
+        closed_today: "Closed today"
+        view: "Branch details"
+    card:
+        zones: "Training zones"
+        view: "View branch"
+    show:
+        back: "All branches"
+        hours: "Opening hours"
+        closed: "Closed"
+        contact: "Contact"
+        plan_title: "Floor plan"
+        plan_lead: "Pick a zone to see what stands in it."
+        plan_empty: "The floor plan for this branch has not been published yet."
+        equipment: "In this zone"
+        trainers: "Coaches at this branch"
+        trainers_empty: "No coaches are assigned to this branch yet."
+    plan:
+        entrance: "Entrance"
+        reception: "Reception"
+        changing-rooms: "Changing rooms"
+
+equipment:
+    type:
+        barbell: "Barbell"
+        dumbbell: "Dumbbells"
+        machine: "Machine"
+        cable: "Cable"
+        kettlebell: "Kettlebells"
+        band: "Bands"
+        bodyweight: "Bodyweight"
+        cardio: "Cardio"
+
+membership:
+    index:
+        kicker: "Memberships"
+        title: "Pick the access you need"
+        lead: "Prices in euro, no joining fee, and a personal training plan included on every tier."
+    per_month: "/ month"
+    per_year: "/ year"
+    monthly_equivalent: "works out at %amount% a month"
+    all_branches: "Every branch in Riga"
+    single_branch: "One branch of your choice"
+    checkout_soon: "Online checkout is coming soon. For now, join at the front desk of any branch."
+
+trainer:
+    index:
+        kicker: "Coaching"
+        title: "Our trainers"
+        lead: "Browse the team by speciality, language and branch. Booking opens shortly."
+    specialities: "Specialities"
+    languages: "Speaks"
+    rate: "%amount% / hour"
+    branch: "Based at"
+    branch_unassigned: "Across all branches"
+    profile: "View profile"
+    booking_soon: "Online booking is coming soon."
+    show:
+        back: "All trainers"
+        about: "About"
+
+speciality:
+    strength: "Strength"
+    hypertrophy: "Hypertrophy"
+    weight_loss: "Weight loss"
+    rehab: "Rehabilitation"
+    conditioning: "Conditioning"
+    powerlifting: "Powerlifting"
+
+language:
+    en: "English"
+    lv: "Latvian"
+    ru: "Russian"

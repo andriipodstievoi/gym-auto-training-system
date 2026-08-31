@@ -1,3 +1,16 @@
+{#
+   Nav entries split in two: pages that exist, and pages a later milestone
+   still owes. The pending ones stay visible so the shape of the site is
+   honest rather than growing an item at a time.
+#}
+{% set links = [
+    { key: 'map', route: 'branch_index', prefix: 'branch_' },
+    { key: 'memberships', route: 'membership_index', prefix: 'membership_' },
+    { key: 'trainers', route: 'trainer_index', prefix: 'trainer_' },
+] %}
+{% set pending = ['shop'] %}
+{% set current = app.request.attributes.get('_route') %}
+
 <header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-iron-800 bg-iron-900/90 backdrop-blur">
     <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <a href="{{ path('home') }}" class="text-2xl font-black tracking-tight text-white">
@@ -5,10 +18,18 @@
         </a>
 
         <nav class="hidden items-center gap-7 text-sm font-medium md:flex">
-            {% for key in ['map', 'memberships', 'trainers', 'shop'] %}
+            {% for link in links %}
+                {% set active = current starts with link.prefix %}
+                <a href="{{ path(link.route) }}"
+                   class="{{ active ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
+                   {{ active ? 'aria-current="page"' : '' }}>
+                    {{ ('nav.' ~ link.key)|trans }}
+                </a>
+            {% endfor %}
+            {% for key in pending %}
                 <span class="cursor-not-allowed text-iron-400" title="{{ 'nav.soon'|trans }}">{{ ('nav.' ~ key)|trans }}</span>
             {% endfor %}
-            <span class="rounded-md bg-signal-500 px-4 py-2 font-semibold text-iron-900">{{ 'nav.quiz'|trans }}</span>
+            <span class="cursor-not-allowed rounded-md bg-signal-500 px-4 py-2 font-semibold text-iron-900" title="{{ 'nav.soon'|trans }}">{{ 'nav.quiz'|trans }}</span>
             {% include 'partials/_locale_switcher.html.twig' %}
         </nav>
 
@@ -22,7 +43,10 @@
 
     <div x-show="open" x-cloak class="border-t border-iron-800 px-4 py-4 md:hidden">
         <div class="flex flex-col gap-3 text-sm">
-            {% for key in ['map', 'memberships', 'trainers', 'shop', 'quiz'] %}
+            {% for link in links %}
+                <a href="{{ path(link.route) }}" class="text-iron-100 hover:text-signal-500">{{ ('nav.' ~ link.key)|trans }}</a>
+            {% endfor %}
+            {% for key in pending|merge(['quiz']) %}
                 <span class="text-iron-400">{{ ('nav.' ~ key)|trans }}</span>
             {% endfor %}
             {% include 'partials/_locale_switcher.html.twig' %}

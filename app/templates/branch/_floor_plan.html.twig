@@ -1,0 +1,85 @@
+{#
+   The clickable plan. Geometry comes from App\Domain\FloorPlan\FloorPlanBuilder,
+   which returns one room per floor zone in zone order, so rooms and zones pair
+   up by index. Each room carries its zone's svgId as the element id, which is
+   what ties a shape in the drawing to a row in the database.
+
+   Without JavaScript every zone's equipment list is simply shown at once.
+#}
+{% set locale = app.request.locale %}
+
+<div x-data="{ active: '{{ (zones|first).svgId }}' }" class="mt-8 grid gap-8 lg:grid-cols-[3fr_2fr]">
+    <figure class="m-0">
+        <svg viewBox="{{ constant('VIEW_BOX', plan) }}" role="group"
+             aria-label="{{ 'branch.show.plan_title'|trans }}"
+             class="w-full rounded-xl border border-iron-800 bg-iron-900">
+            <rect x="4" y="4" width="872" height="512" rx="14"
+                  class="fill-iron-800/30 stroke-iron-800" stroke-width="2"/>
+
+            {% for room in plan.serviceRooms %}
+                <g>
+                    <rect x="{{ room.x }}" y="{{ room.y }}" width="{{ room.width }}" height="{{ room.height }}"
+                          rx="8" class="fill-iron-800/50 stroke-iron-800" stroke-width="2"/>
+                    <text x="{{ room.centreX }}" y="{{ room.centreY }}" text-anchor="middle" dominant-baseline="middle"
+                          class="fill-iron-400 text-[15px]">{{ ('branch.plan.' ~ room.svgId)|trans }}</text>
+                </g>
+            {% endfor %}
+
+            {% for index, room in plan.trainingRooms %}
+                {% set zone = zones[index] %}
+                <g role="button" tabindex="0"
+                   class="cursor-pointer focus:outline-none"
+                   aria-label="{{ zone.name.get(locale) }}"
+                   :aria-pressed="active === '{{ zone.svgId }}'"
+                   @click="active = '{{ zone.svgId }}'"
+                   @keydown.enter.prevent="active = '{{ zone.svgId }}'"
+                   @keydown.space.prevent="active = '{{ zone.svgId }}'">
+                    <rect id="zone-{{ zone.svgId }}"
+                          x="{{ room.x }}" y="{{ room.y }}" width="{{ room.width }}" height="{{ room.height }}"
+                          rx="10" stroke-width="2"
+                          class="fill-iron-800 stroke-iron-600 transition-colors hover:fill-iron-600/40"
+                          :class="active === '{{ zone.svgId }}' ? 'fill-signal-500/25 stroke-signal-500' : 'fill-iron-800 stroke-iron-600 hover:fill-iron-600/40'"/>
+
+                    <text x="{{ room.centreX }}" y="{{ room.centreY - 12 }}" text-anchor="middle" dominant-baseline="middle"
+                          class="pointer-events-none fill-white text-[19px] font-bold">{{ zone.name.get(locale) }}</text>
+                </g>
+
+                {# The kit count sits outside the button on purpose: it is not
+                   part of the control's label, and folding it in would leave
+                   the accessible name disagreeing with the visible one. The
+                   equipment list beside the plan is where it is read out
+                   properly. pointer-events-none drops clicks through to the
+                   room underneath, so the number is still a live target. #}
+                <text x="{{ room.centreX }}" y="{{ room.centreY + 16 }}" text-anchor="middle" dominant-baseline="middle"
+                      aria-hidden="true"
+                      class="pointer-events-none fill-iron-400 text-[15px]">&times;{{ zone.equipment|reduce((total, item) => total + item.quantity, 0) }}</text>
+            {% endfor %}
+        </svg>
+    </figure>
+
+    <div>
+        <h3 class="text-lg font-bold text-white">{{ 'branch.show.equipment'|trans }}</h3>
+
+        {% for zone in zones %}
+            <div x-show="active === '{{ zone.svgId }}'" x-cloak class="mt-4">
+                <p class="text-sm font-semibold uppercase tracking-wide text-signal-500">{{ zone.name.get(locale) }}</p>
+
+                {% if zone.description and not zone.description.isEmpty %}
+                    <p class="mt-2 text-sm text-iron-200">{{ zone.description.get(locale) }}</p>
+                {% endif %}
+
+                <ul class="mt-3 divide-y divide-iron-800 rounded-lg border border-iron-800">
+                    {% for item in zone.equipment %}
+                        <li class="flex items-center justify-between gap-3 px-4 py-3">
+                            <span class="text-sm text-iron-100">{{ item.name.get(locale) }}</span>
+                            <span class="flex shrink-0 items-center gap-2">
+                                <span class="rounded bg-iron-800 px-2 py-0.5 text-xs text-iron-400">{{ ('equipment.type.' ~ item.type.value)|trans }}</span>
+                                <span class="font-mono text-sm text-iron-200">&times;{{ item.quantity }}</span>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% set locale = app.request.locale %}
+
+{% block title %}{{ branch.name }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ branch.description ? branch.description.get(locale) : 'branch.index.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-6xl px-4 pt-10">
+        <a href="{{ path('branch_index') }}" class="text-sm font-medium text-iron-400 hover:text-signal-500">
+            &larr; {{ 'branch.show.back'|trans }}
+        </a>
+
+        <div class="mt-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black leading-tight text-white sm:text-5xl">{{ branch.name }}</h1>
+                <p class="mt-3 text-lg text-iron-200">{{ branch.addressLine }}, {{ branch.city }} {{ branch.postalCode }}</p>
+            </div>
+
+            {% if schedule.isOpenAt(now) %}
+                <span class="rounded-full bg-signal-500 px-3 py-1.5 text-sm font-bold uppercase tracking-wide text-iron-900">{{ 'branch.map.open_now'|trans }}</span>
+            {% else %}
+                <span class="rounded-full border border-iron-600 px-3 py-1.5 text-sm font-bold uppercase tracking-wide text-iron-400">{{ 'branch.show.closed'|trans }}</span>
+            {% endif %}
+        </div>
+
+        {% if branch.description and not branch.description.isEmpty %}
+            <p class="mt-6 max-w-3xl leading-relaxed text-iron-200">{{ branch.description.get(locale) }}</p>
+        {% endif %}
+    </section>
+
+    <section class="mx-auto max-w-6xl px-4 py-10">
+        <div class="grid gap-6 sm:grid-cols-2">
+            <div class="rounded-xl border border-iron-800 bg-iron-800/40 p-6">
+                <h2 class="text-lg font-bold text-white">{{ 'branch.show.hours'|trans }}</h2>
+
+                <dl class="mt-4 space-y-2 text-sm">
+                    {% for run in schedule.grouped %}
+                        <div class="flex justify-between gap-4">
+                            <dt class="text-iron-400">
+                                {{ ('weekday.' ~ run.firstDay)|trans }}
+                                {%- if not run.isSingleDay %}&ndash;{{ ('weekday.' ~ run.lastDay)|trans }}{% endif %}
+                            </dt>
+                            <dd class="font-mono text-iron-100">{{ run.period.open }}&ndash;{{ run.period.close }}</dd>
+                        </div>
+                    {% endfor %}
+                </dl>
+            </div>
+
+            <div class="rounded-xl border border-iron-800 bg-iron-800/40 p-6">
+                <h2 class="text-lg font-bold text-white">{{ 'branch.show.contact'|trans }}</h2>
+
+                <ul class="mt-4 space-y-2 text-sm">
+                    <li><a class="text-iron-100 hover:text-signal-500" href="tel:{{ branch.phone|replace({' ': ''}) }}">{{ branch.phone }}</a></li>
+                    <li><a class="text-iron-100 hover:text-signal-500" href="mailto:{{ branch.email }}">{{ branch.email }}</a></li>
+                    <li>
+                        <a class="text-signal-500 hover:text-signal-400"
+                           href="https://www.openstreetmap.org/?mlat={{ branch.latitude }}&mlon={{ branch.longitude }}#map=17/{{ branch.latitude }}/{{ branch.longitude }}"
+                           target="_blank" rel="noopener noreferrer">OpenStreetMap &nearr;</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="mx-auto max-w-6xl px-4 pb-12">
+        <h2 class="text-2xl font-bold text-white">{{ 'branch.show.plan_title'|trans }}</h2>
+
+        {% if zones is empty %}
+            <p class="mt-3 text-iron-400">{{ 'branch.show.plan_empty'|trans }}</p>
+        {% else %}
+            <p class="mt-2 text-sm text-iron-400">{{ 'branch.show.plan_lead'|trans }}</p>
+            {% include 'branch/_floor_plan.html.twig' %}
+        {% endif %}
+    </section>
+
+    <section class="mx-auto max-w-6xl px-4 pb-16">
+        <h2 class="text-2xl font-bold text-white">{{ 'branch.show.trainers'|trans }}</h2>
+
+        {% if trainers is empty %}
+            <p class="mt-3 text-iron-400">{{ 'branch.show.trainers_empty'|trans }}</p>
+        {% else %}
+            <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {% for trainer in trainers %}
+                    <a href="{{ path('trainer_show', {slug: trainer.slug}) }}"
+                       class="rounded-xl border border-iron-800 bg-iron-800/40 p-5 transition hover:border-signal-600">
+                        <p class="font-bold text-white">{{ trainer.fullName }}</p>
+                        <p class="mt-2 text-xs text-iron-400">
+                            {{ trainer.specialityEnums|map(s => ('speciality.' ~ s.value)|trans)|join(' · ') }}
+                        </p>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

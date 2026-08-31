@@ -9,8 +9,9 @@
         <p class="mt-6 max-w-2xl text-lg text-iron-200">{{ 'home.hero.lead'|trans }}</p>
 
         <div class="mt-9 flex flex-wrap gap-3">
-            <span class="rounded-md bg-signal-500 px-6 py-3 font-semibold text-iron-900">{{ 'home.hero.cta'|trans }}</span>
-            <span class="rounded-md border border-iron-600 px-6 py-3 font-semibold text-iron-200">{{ 'home.hero.secondary'|trans }}</span>
+            <span class="cursor-not-allowed rounded-md bg-signal-500 px-6 py-3 font-semibold text-iron-900" title="{{ 'nav.soon'|trans }}">{{ 'home.hero.cta'|trans }}</span>
+            <a href="{{ path('membership_index') }}" class="rounded-md border border-iron-600 px-6 py-3 font-semibold text-iron-200 transition hover:border-signal-600 hover:text-white">{{ 'home.hero.secondary'|trans }}</a>
+            <a href="{{ path('branch_index') }}" class="rounded-md border border-iron-600 px-6 py-3 font-semibold text-iron-200 transition hover:border-signal-600 hover:text-white">{{ 'home.hero.branches'|trans }}</a>
         </div>
     </section>
 

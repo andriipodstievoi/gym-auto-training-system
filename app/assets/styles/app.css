@@ -3,6 +3,8 @@
 /* Tailwind v4 scans these for class names. */
 @source "../../templates/**/*.twig";
 @source "../**/*.js";
+/* Downloaded vendor bundles are not ours to scan for utility classes. */
+@source not "../vendor";
 
 @theme {
     /* Gym brand palette - iron greys with a signal-orange accent. */
@@ -23,3 +25,61 @@
 
 /* Alpine: hide elements until Alpine has initialised. */
 [x-cloak] { display: none !important; }
+
+/*
+   Leaflet ships a light-themed control skin and a PNG marker resolved relative
+   to its own stylesheet, which AssetMapper renames. The marker is replaced by
+   a div icon in map.js and styled here; the rest is the map dressed to match
+   the site rather than sitting on it as a white rectangle.
+*/
+.branch-pin {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    border: 3px solid var(--color-iron-900);
+    background: var(--color-iron-400);
+    box-shadow: 0 0 0 2px var(--color-iron-400);
+}
+
+.branch-pin--open {
+    background: var(--color-signal-500);
+    box-shadow: 0 0 0 2px var(--color-signal-500), 0 0 14px 2px color-mix(in oklab, var(--color-signal-500) 55%, transparent);
+}
+
+.leaflet-container {
+    background: var(--color-iron-800);
+    font: inherit;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    background: var(--color-iron-800);
+    color: var(--color-iron-100);
+    border: 1px solid var(--color-iron-600);
+}
+
+.leaflet-popup-content-wrapper { border-radius: 0.75rem; }
+.leaflet-popup-content { margin: 0.875rem 1rem; font-size: 0.875rem; line-height: 1.5; }
+.leaflet-popup-close-button { color: var(--color-iron-400) !important; }
+
+.branch-popup__name { font-weight: 700; color: #fff; font-size: 1rem; }
+.branch-popup__open { color: var(--color-signal-500); }
+.branch-popup__shut { color: var(--color-iron-400); }
+.branch-popup__link {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    color: var(--color-signal-500);
+}
+.branch-popup__link:hover { color: var(--color-signal-400); }
+
+.leaflet-bar a,
+.leaflet-control-attribution {
+    background: var(--color-iron-800);
+    color: var(--color-iron-200);
+    border-color: var(--color-iron-600);
+}
+
+.leaflet-bar a:hover { background: var(--color-iron-600); color: #fff; }
+.leaflet-control-attribution a { color: var(--color-signal-500); }

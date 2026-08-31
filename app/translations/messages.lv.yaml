@@ -18,6 +18,7 @@ home:
         lead: "Atbildi uz īsu anketu. Saņem periodizētu programmu, kas pielāgota tavam mērķim, grafikam, pieejamajam inventāram un traumām."
         cta: "Sākt anketu"
         secondary: "Apskatīt abonementus"
+        branches: "Atrast filiāli"
     features:
         title: "Ko šī zāle piedāvā tiešsaistē"
         map:
@@ -37,8 +38,101 @@ home:
             text: "Anketa nonāk programmas ģeneratorā: sadalījums, apjoms, progresija un vingrinājumu izvēle tiek aprēķināti tev."
     status:
         title: "Izstrādes statuss"
-        lead: "Šis ir M0 posms — pamati ir gatavi, un katra funkcija zemāk ir ieplānota."
+        lead: "Publiskā vietne ir gatava līdz M2. Viss, kas atzīmēts kā plānots, vēl ir priekšā."
 
 footer:
     address: "Rīga, Latvija"
     disclaimer: "Treniņu plāni ir vispārīgi fitnesa ieteikumi, nevis medicīnisks padoms."
+
+weekday:
+    '1': Pr
+    '2': Ot
+    '3': Tr
+    '4': Ce
+    '5': Pk
+    '6': Se
+    '7': Sv
+
+branch:
+    index:
+        kicker: "Rīga · trīs filiāles"
+        title: "Atrodi savu filiāli"
+        lead: "Katra SPĒKS zāle: kur tā atrodas, kad ir atvērta un kas tieši tajā stāv."
+        heading: "Visas filiāles"
+    map:
+        hint: "Izvēlies atzīmi, lai redzētu darba laiku un pārietu uz filiāli."
+        today: "Šodien"
+        open_now: "Tagad atvērts"
+        closed_now: "Tagad slēgts"
+        closed_today: "Šodien slēgts"
+        view: "Filiāles apraksts"
+    card:
+        zones: "Treniņu zonas"
+        view: "Apskatīt filiāli"
+    show:
+        back: "Visas filiāles"
+        hours: "Darba laiks"
+        closed: "Slēgts"
+        contact: "Kontakti"
+        plan_title: "Zāles plāns"
+        plan_lead: "Izvēlies zonu, lai redzētu, kas tajā ir."
+        plan_empty: "Šīs filiāles zāles plāns vēl nav publicēts."
+        equipment: "Šajā zonā"
+        trainers: "Šīs filiāles treneri"
+        trainers_empty: "Šai filiālei vēl nav piesaistīts neviens treneris."
+    plan:
+        entrance: "Ieeja"
+        reception: "Reģistratūra"
+        changing-rooms: "Ģērbtuves"
+
+equipment:
+    type:
+        barbell: "Stienis"
+        dumbbell: "Hanteles"
+        machine: "Trenažieris"
+        cable: "Bloki"
+        kettlebell: "Svaru bumbas"
+        band: "Gumijas"
+        bodyweight: "Sava svara"
+        cardio: "Kardio"
+
+membership:
+    index:
+        kicker: "Abonementi"
+        title: "Izvēlies sev vajadzīgo piekļuvi"
+        lead: "Cenas eiro, bez iestāšanās maksas, un personīgais treniņu plāns iekļauts katrā līmenī."
+    per_month: "/ mēnesī"
+    per_year: "/ gadā"
+    monthly_equivalent: "sanāk %amount% mēnesī"
+    all_branches: "Visas filiāles Rīgā"
+    single_branch: "Viena filiāle pēc tavas izvēles"
+    checkout_soon: "Apmaksa tiešsaistē drīzumā. Pagaidām pievienojies jebkuras filiāles reģistratūrā."
+
+trainer:
+    index:
+        kicker: "Treniņi ar treneri"
+        title: "Mūsu treneri"
+        lead: "Iepazīsti komandu pēc specializācijas, valodas un filiāles. Pieteikšanās būs pieejama drīzumā."
+    specialities: "Specializācija"
+    languages: "Valodas"
+    rate: "%amount% / stundā"
+    branch: "Filiāle"
+    branch_unassigned: "Visās filiālēs"
+    profile: "Skatīt profilu"
+    booking_soon: "Pieteikšanās tiešsaistē būs pieejama drīzumā."
+    show:
+        back: "Visi treneri"
+        about: "Par treneri"
+
+speciality:
+    strength: "Spēks"
+    hypertrophy: "Muskuļu masa"
+    weight_loss: "Svara samazināšana"
+    rehab: "Rehabilitācija"
+    conditioning: "Kondīcija"
+    powerlifting: "Spēka trīscīņa"
+
+language:
+    en: "Angļu"
+    lv: "Latviešu"
+    ru: "Krievu"

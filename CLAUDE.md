@@ -125,6 +125,15 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   use `Exception\InvalidType::new()` and `Exception\ValueNotConvertible::new()`.
 - Symfony **8 requires PHP 8.4**, so this project stays on **7.4 LTS**.
 - Files committed from Windows need `git update-index --chmod=+x` for anything Linux CI executes.
+- `assets/vendor/` is git-ignored, so CI has no downloaded JS until `composer install` fires
+  `importmap:install` from `post-install-cmd`. Nothing extra is needed in the workflow.
+- Leaflet's default marker is a PNG the stylesheet resolves relative to itself, and AssetMapper
+  digests that filename, so it 404s. `assets/map.js` uses a `divIcon` instead - which is also
+  how the pins get the brand colour.
+- Anything a `<g role="button">` visibly contains becomes part of the label axe compares against
+  its accessible name. Adornments inside the group (the floor plan's kit counts) trip
+  `label-content-name-mismatch`; `aria-hidden` on them is **not** honoured for SVG text, so keep
+  them outside the group and let `pointer-events-none` drop clicks through.
 - The working copy lives at **`C:\dev\gym-proj`**, deliberately outside OneDrive — `vendor/`,
   `.venv/` and the 107 MB Tailwind binary in `app/var/` come to ~350 MB and used to sync on
   every build. Do not move it back under `OneDrive\Desktop`.
@@ -135,8 +144,8 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 |---|---|---|
 | M0 | Foundation — framework, assets, i18n, Docker, CI | done |
 | M1 | Domain model, migrations, fixtures, back office | done |
-| M2 | Public site, Leaflet branch map, SVG floor plan | **next** |
-| M3 | Accounts, memberships, Stripe test checkout | planned |
+| M2 | Public site, Leaflet branch map, SVG floor plan | done |
+| M3 | Accounts, memberships, Stripe test checkout | **next** |
 | M4 | Shop — catalogue, cart, orders | planned |
 | M5 | Trainers, availability, booking, messaging | planned |
 | M6 | Assessment, rule engine, LLM layer, PDF export | planned |

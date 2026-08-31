@@ -16,7 +16,18 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
+    'map' => [
+        'path' => './assets/map.js',
+        'entrypoint' => true,
+    ],
     'alpinejs' => [
         'version' => '3.16.3',
+    ],
+    'leaflet' => [
+        'version' => '1.9.4',
+    ],
+    'leaflet/dist/leaflet.min.css' => [
+        'version' => '1.9.4',
+        'type' => 'css',
     ],
 ];

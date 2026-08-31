@@ -7,6 +7,10 @@
         <meta name="description" content="{% block description %}{{ 'brand.tagline'|trans }}{% endblock %}">
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.05em%22 font-size=%22104%22>🏋️</text></svg>">
 
+        {# Without Alpine there is nothing to reveal things later, so x-cloak
+           must stop hiding them. The floor plan then shows every zone at once. #}
+        <noscript><style>[x-cloak] { display: revert !important; }</style></noscript>
+
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}

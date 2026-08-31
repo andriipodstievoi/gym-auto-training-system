@@ -59,7 +59,7 @@ loads. The site produces valid programmes with no API key configured.
 |---|---|---|
 | **M0** | Foundation — framework, assets, i18n, Docker, CI | ✅ done |
 | **M1** | Domain model, migrations, fixtures, back office | ✅ done |
-| M2 | Public site, Leaflet branch map, SVG floor plan | planned |
+| **M2** | Public site, Leaflet branch map, SVG floor plan | ✅ done |
 | M3 | Accounts, memberships, Stripe test checkout | planned |
 | M4 | Shop — catalogue, cart, orders | planned |
 | M5 | Trainers, availability, booking, messaging | planned |

@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% set locale = app.request.locale %}
+
+{% block title %}{{ 'membership.index.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'membership.index.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-6xl px-4 pt-14 pb-8">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-signal-500">{{ 'membership.index.kicker'|trans }}</p>
+        <h1 class="mt-3 text-4xl font-black leading-tight text-white sm:text-5xl">{{ 'membership.index.title'|trans }}</h1>
+        <p class="mt-4 max-w-2xl text-lg text-iron-200">{{ 'membership.index.lead'|trans }}</p>
+    </section>
+
+    <section class="mx-auto max-w-6xl px-4 pb-6">
+        <div class="grid gap-5 md:grid-cols-3">
+            {% for plan in plans %}
+                <article class="flex flex-col rounded-xl border border-iron-800 bg-iron-800/40 p-7">
+                    <h2 class="text-xl font-bold text-white">{{ plan.name.get(locale) }}</h2>
+
+                    <p class="mt-4 flex items-baseline gap-2">
+                        <span class="text-4xl font-black text-white">{{ (plan.priceCents / 100)|format_currency('EUR') }}</span>
+                        <span class="text-sm text-iron-400">
+                            {{- plan.billingInterval.value == 'yearly' ? 'membership.per_year'|trans : 'membership.per_month'|trans -}}
+                        </span>
+                    </p>
+
+                    {% if plan.billingInterval.value == 'yearly' %}
+                        <p class="mt-1 text-xs text-signal-500">
+                            {{ 'membership.monthly_equivalent'|trans({'%amount%': (plan.monthlyEquivalentCents / 100)|format_currency('EUR')}) }}
+                        </p>
+                    {% endif %}
+
+                    {% if plan.description and not plan.description.isEmpty %}
+                        <p class="mt-4 text-sm leading-relaxed text-iron-200">{{ plan.description.get(locale) }}</p>
+                    {% endif %}
+
+                    <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-iron-400">
+                        {{ plan.allBranches ? 'membership.all_branches'|trans : 'membership.single_branch'|trans }}
+                    </p>
+
+                    <ul class="mt-5 space-y-2 text-sm text-iron-200">
+                        {% for feature in plan.getFeatureLines(locale) %}
+                            <li class="flex gap-2">
+                                <span aria-hidden="true" class="text-signal-500">&check;</span>
+                                <span>{{ feature }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# Checkout arrives in M3; until then the page is honest about it. #}
+    <section class="mx-auto max-w-6xl px-4 pb-16">
+        <p class="rounded-xl border border-iron-800 bg-iron-800/40 px-6 py-4 text-sm text-iron-400">
+            {{ 'membership.checkout_soon'|trans }}
+        </p>
+    </section>
+{% endblock %}
