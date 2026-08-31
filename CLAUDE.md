@@ -134,6 +134,13 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   its accessible name. Adornments inside the group (the floor plan's kit counts) trip
   `label-content-name-mismatch`; `aria-hidden` on them is **not** honoured for SVG text, so keep
   them outside the group and let `pointer-events-none` drop clicks through.
+- `.gitattributes` enforces **LF**. Python's `pathlib.write_text` emits CRLF on Windows unless
+  you pass `newline='
+'`, and php-cs-fixer then rewrites the whole file. Check with
+  `grep -qU $''` before committing.
+- `bin/console cache:clear` regularly exceeds two minutes on this machine. `rm -rf var/cache/dev`
+  followed by `cache:warmup --env=dev` does the same job in seconds.
+- `lines` is a **reserved word in MySQL 8.4**, like `interval`. Alias it in ad-hoc `dbal:run-sql`.
 - The working copy lives at **`C:\dev\gym-proj`**, deliberately outside OneDrive — `vendor/`,
   `.venv/` and the 107 MB Tailwind binary in `app/var/` come to ~350 MB and used to sync on
   every build. Do not move it back under `OneDrive\Desktop`.
