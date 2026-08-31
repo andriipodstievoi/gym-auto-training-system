@@ -30,6 +30,17 @@
                 <span class="cursor-not-allowed text-iron-400" title="{{ 'nav.soon'|trans }}">{{ ('nav.' ~ key)|trans }}</span>
             {% endfor %}
             <span class="cursor-not-allowed rounded-md bg-signal-500 px-4 py-2 font-semibold text-iron-900" title="{{ 'nav.soon'|trans }}">{{ 'nav.quiz'|trans }}</span>
+
+            {% if app.user %}
+                {% set on_account = current starts with 'app_account' %}
+                <a href="{{ path('app_account') }}"
+                   class="{{ on_account ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
+                   {{ on_account ? 'aria-current="page"' : '' }}>{{ 'nav.account'|trans }}</a>
+                <a href="{{ path('app_logout') }}" class="text-iron-400 hover:text-white">{{ 'nav.logout'|trans }}</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="text-iron-200 hover:text-white">{{ 'nav.login'|trans }}</a>
+            {% endif %}
+
             {% include 'partials/_locale_switcher.html.twig' %}
         </nav>
 
@@ -49,6 +60,14 @@
             {% for key in pending|merge(['quiz']) %}
                 <span class="text-iron-400">{{ ('nav.' ~ key)|trans }}</span>
             {% endfor %}
+
+            {% if app.user %}
+                <a href="{{ path('app_account') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.account'|trans }}</a>
+                <a href="{{ path('app_logout') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.logout'|trans }}</a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.login'|trans }}</a>
+            {% endif %}
+
             {% include 'partials/_locale_switcher.html.twig' %}
         </div>
     </div>

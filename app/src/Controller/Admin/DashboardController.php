@@ -14,9 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Back office for the gym staff.
  *
- * Access is currently gated by HTTP basic auth against a single in-memory
- * account - see config/packages/security.yaml. Real accounts and roles land
- * in M3, and this placeholder goes away then.
+ * Reachable only with ROLE_ADMIN, through the same form login the rest of the
+ * site uses - see config/packages/security.yaml.
  */
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 final class DashboardController extends AbstractDashboardController
@@ -49,10 +48,12 @@ final class DashboardController extends AbstractDashboardController
 
         yield MenuItem::section('Commerce');
         yield MenuItem::linkTo(MembershipPlanCrudController::class, 'Membership plans', 'fa fa-id-card');
+        yield MenuItem::linkTo(UserMembershipCrudController::class, 'Memberships sold', 'fa fa-address-card');
         yield MenuItem::linkTo(ProductCategoryCrudController::class, 'Product categories', 'fa fa-tags');
         yield MenuItem::linkTo(ProductCrudController::class, 'Products', 'fa fa-box');
 
         yield MenuItem::section('People');
+        yield MenuItem::linkTo(UserCrudController::class, 'Users', 'fa fa-user');
         yield MenuItem::linkTo(TrainerCrudController::class, 'Trainers', 'fa fa-user-tie');
 
         yield MenuItem::section('Training');

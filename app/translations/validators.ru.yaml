@@ -1,0 +1,14 @@
+# Сообщения о нарушении ограничений. Компонент Validator всегда переводит их
+# в домене "validators", а не в "messages".
+register:
+    error:
+        email_taken: "Аккаунт с этой почтой уже существует."
+        password_mismatch: "Пароли не совпадают."
+        password_blank: "Пожалуйста, выбери пароль."
+        password_short: "Используй минимум 8 символов."
+        password_weak: "Такой пароль слишком легко угадать. Выбери длиннее."
+
+account:
+    password:
+        error:
+            current_wrong: "Это не твой текущий пароль."

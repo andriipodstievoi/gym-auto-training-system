@@ -1,0 +1,44 @@
+{#
+   One labelled, error-aware field.
+
+   Rendered by hand rather than through a form theme so the markup, the
+   Tailwind classes and - the part a theme keeps getting wrong - the link
+   between the input, its help text and its errors stay under our control.
+#}
+{% macro field(form, options = {}) %}
+    {% set has_errors = form.vars.errors|length > 0 %}
+    {% set help_id = form.vars.id ~ '_help' %}
+    {% set error_id = form.vars.id ~ '_error' %}
+    {% set described_by = [
+        form.vars.help is not empty ? help_id : null,
+        has_errors ? error_id : null,
+    ]|filter(v => v is not null)|join(' ') %}
+
+    <div class="{{ options.class|default('') }}">
+        {{ form_label(form, options.label|default(null), {
+            label_attr: { class: 'block text-sm font-medium text-iron-200' },
+        }) }}
+
+        {# The aria attributes fall back to false rather than null: Symfony
+           drops a false attribute entirely, where null would leave an empty
+           aria-describedby on the input for axe to complain about. #}
+        {{ form_widget(form, {
+            attr: form.vars.attr|merge({
+                class: 'mt-1.5 w-full rounded-lg border bg-iron-900 px-3 py-2 text-white placeholder-iron-500 outline-none focus:ring-2 focus:ring-signal-500 '
+                    ~ (has_errors ? 'border-red-500/70' : 'border-iron-700'),
+                'aria-describedby': described_by is not empty ? described_by : false,
+                'aria-invalid': has_errors ? 'true' : false,
+            }),
+        }) }}
+
+        {% if form.vars.help is not empty %}
+            <p id="{{ help_id }}" class="mt-1.5 text-xs text-iron-400">{{ form.vars.help|trans }}</p>
+        {% endif %}
+
+        {% if has_errors %}
+            <p id="{{ error_id }}" class="mt-1.5 text-xs text-red-300">
+                {% for error in form.vars.errors %}{{ error.message }}{% if not loop.last %} {% endif %}{% endfor %}
+            </p>
+        {% endif %}
+    </div>
+{% endmacro %}

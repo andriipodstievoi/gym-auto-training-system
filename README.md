@@ -60,7 +60,7 @@ loads. The site produces valid programmes with no API key configured.
 | **M0** | Foundation — framework, assets, i18n, Docker, CI | ✅ done |
 | **M1** | Domain model, migrations, fixtures, back office | ✅ done |
 | **M2** | Public site, Leaflet branch map, SVG floor plan | ✅ done |
-| M3 | Accounts, memberships, Stripe test checkout | planned |
+| **M3** | Accounts, memberships, Stripe test checkout | ✅ done |
 | M4 | Shop — catalogue, cart, orders | planned |
 | M5 | Trainers, availability, booking, messaging | planned |
 | M6 | Assessment, rule engine, LLM layer, PDF export | planned |
@@ -127,10 +127,20 @@ http://127.0.0.1:8000/admin — branches, floor zones, equipment, membership
 plans, trainers, the shop catalogue and the exercise library, each with
 per-locale inputs for translated fields.
 
-It is currently behind HTTP basic auth against a single in-memory account
-(`admin` / `speks-dev`), defined in `config/packages/security.yaml`. That is a
-**placeholder**: M3 replaces it with real accounts and roles. Override
-`ADMIN_PASSWORD_HASH` anywhere this is not a local machine.
+Reachable only with `ROLE_ADMIN`, through the same form login the rest of the
+site uses. Staff are ordinary `User` rows carrying that role - there is no
+separate admin login and no in-memory account any more.
+
+The fixtures seed three accounts, all with the password `speks-dev`:
+
+| Email | Role | State |
+|---|---|---|
+| `admin@speks.lv` | `ROLE_ADMIN` | back office |
+| `member@speks.lv` | `ROLE_USER` | holds an active membership |
+| `prospect@speks.lv` | `ROLE_USER` | no membership yet |
+
+They exist only in a local or CI database. Anywhere else, create the first
+administrator yourself.
 
 ### Required PHP extensions
 
@@ -144,8 +154,21 @@ It is currently behind HTTP basic auth against a single in-memory account
 `app/.env.local`, which is git-ignored:
 
 ```dotenv
+STRIPE_PUBLIC_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+**Running with no Stripe keys is a supported state**, and the one this
+repository ships in. The site boots, every page renders, and the membership
+page says checkout is unavailable rather than offering a button that cannot
+work. Tests cover that state explicitly.
+
+With test keys configured, forward webhooks to the local endpoint so a payment
+can actually be confirmed — nothing else is allowed to activate a membership:
+
+```bash
+stripe listen --forward-to http://127.0.0.1:8000/webhook/stripe
 ```
 
 The plan service reads `AI_ANTHROPIC_API_KEY` from its own environment. Leave it

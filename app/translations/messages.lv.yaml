@@ -10,6 +10,9 @@ nav:
     quiz: Saņem savu plānu
     menu: Izvēlne
     soon: Drīzumā
+    account: Konts
+    login: Pieslēgties
+    logout: Iziet
 
 home:
     hero:
@@ -114,7 +117,18 @@ membership:
     monthly_equivalent: "sanāk %amount% mēnesī"
     all_branches: "Visas filiāles Rīgā"
     single_branch: "Viena filiāle pēc tavas izvēles"
-    checkout_soon: "Apmaksa tiešsaistē drīzumā. Pagaidām pievienojies jebkuras filiāles reģistratūrā."
+    buy: "Pievienoties %plan%"
+    already_member: "Tavs pašreizējais abonements"
+    sign_in_to_join: "Pieslēdzies, lai pievienotos"
+    checkout_unavailable: "Apmaksa nav pieejama"
+    checkout_note: "Maksājumus apstrādā Stripe testa režīmā - neviena īsta karte netiek debetēta."
+    checkout_unavailable_note: "Šajā instalācijā karšu maksājumi nav konfigurēti, tāpēc pievienošanās pogas ir izslēgtas. Pievienojies jebkuras filiāles reģistratūrā."
+    flash:
+        payments_unavailable: "Karšu maksājumi pašlaik nav pieejami. Lūdzu, pievienojies reģistratūrā."
+        already_member: "Tev jau ir aktīvs abonements."
+        checkout_failed: "Neizdevās sākt maksājumu. Nekas netika debetēts - lūdzu, mēģini vēlreiz."
+        checkout_cancelled: "Maksājums atcelts. Nekas netika debetēts."
+        invalid_token: "Šī forma ir novecojusi. Lūdzu, mēģini vēlreiz."
 
 trainer:
     index:
@@ -144,3 +158,96 @@ language:
     en: "Angļu"
     lv: "Latviešu"
     ru: "Krievu"
+
+login:
+    title: "Pieslēgties"
+    lead: "Aiz šīs formas ir tavs abonements, tavs plāns un tavi pieraksti."
+    email: "E-pasts"
+    password: "Parole"
+    submit: "Pieslēgties"
+    no_account: "Vēl nav konta?"
+    register_link: "Izveido to"
+
+register:
+    title: "Izveidot kontu"
+    lead: "Viens konts abonementiem, pierakstiem un tavam treniņu plānam."
+    first_name: "Vārds"
+    last_name: "Uzvārds"
+    email: "E-pasts"
+    password: "Parole"
+    password_repeat: "Atkārto paroli"
+    password_help: "Vismaz 8 rakstzīmes."
+    submit: "Izveidot kontu"
+    have_account: "Jau ir konts?"
+    login_link: "Pieslēdzies"
+    error:
+        summary: "Lūdzu, pārbaudi laukus zemāk."
+    flash:
+        welcome: "Laipni lūdzam SPĒKS. Tavs konts ir gatavs."
+
+account:
+    kicker: "Tavs konts"
+    title: "Konts"
+    lead: "Tavs abonements un tavi dati."
+    greeting: "Sveiks, %name%"
+    nav:
+        label: "Konta sadaļas"
+        overview: "Pārskats"
+        profile: "Profils"
+    membership:
+        title: "Tavs abonements"
+        paid: "Samaksāts"
+        started: "Sākts"
+        renews: "Derīgs līdz"
+        days_left: "Atlikušās dienas"
+        none: "Tev vēl nav aktīva abonementa."
+        browse: "Apskatīt abonementus"
+    history:
+        title: "Pirkumu vēsture"
+        plan: "Abonements"
+        bought: "Pirkts"
+        price: "Cena"
+        status: "Statuss"
+    status:
+        pending: "Gaida apmaksu"
+        active: "Aktīvs"
+        cancelled: "Atcelts"
+        expired: "Beidzies"
+    profile:
+        title: "Tavi dati"
+        lead: "Vārds, e-pasts un valoda, kurā tev rakstām."
+        language: "Valoda"
+        language_help: "Izmanto konta un abonementa e-pastiem."
+        submit: "Saglabāt datus"
+        flash:
+            saved: "Tavi dati ir saglabāti."
+    password:
+        title: "Parole"
+        lead: "Nomaini paroli, ar kuru pieslēdzies."
+        current: "Pašreizējā parole"
+        new: "Jaunā parole"
+        repeat: "Atkārto jauno paroli"
+        submit: "Nomainīt paroli"
+        flash:
+            changed: "Tava parole ir nomainīta."
+
+checkout:
+    success:
+        kicker: "Maksājums saņemts"
+        title: "Paldies"
+        lead: "Tavs %plan% abonements tiek sagatavots."
+        confirming: "Stripe vēl apstiprina maksājumu. Šī lapa un tavs konts atjaunosies pēc brīža - tev vairs nekas nav jādara."
+        unknown: "Neizdevās sasaistīt šo maksājumu ar abonementu. Ja nauda tika norakstīta, sazinies ar mums un mēs to sakārtosim."
+        to_account: "Uz manu kontu"
+
+email:
+    welcome:
+        subject: "Laipni lūdzam SPĒKS"
+        heading: "Sveiks, %name%"
+        body: "Tavs konts ir gatavs. Izvēlies abonementu, kad būsi gatavs, un treniņu plāns nāk līdzi."
+        cta: "Apskatīt abonementus"
+    membership:
+        subject: "Tavs SPĒKS abonements ir aktīvs"
+        heading: "Tavs abonements ir aktīvs"
+        body: "Tavs %plan% abonements ir apstiprināts. Pirmajā reizē reģistratūrā parādi savu kontu."
+        cta: "Atvērt manu kontu"

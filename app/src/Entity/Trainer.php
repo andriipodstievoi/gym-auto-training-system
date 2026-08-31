@@ -15,8 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * A coach members can browse and, from M5, book.
  *
- * Deliberately not tied to a User account yet - accounts arrive in M3, and a
- * nullable user relation can be added then without reshaping this table.
+ * The account is optional on purpose: a coach goes on the public site as soon
+ * as staff add them, and only needs a login once there is something to sign in
+ * for - their schedule and their messages, both of which are M5.
  */
 #[ORM\Entity(repositoryClass: TrainerRepository::class)]
 #[ORM\Table(name: 'trainer')]
@@ -66,6 +67,14 @@ class Trainer
     #[ORM\ManyToOne(targetEntity: Branch::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Branch $branch = null;
+
+    /**
+     * The login this coach signs in with, once they have one. Deleting the
+     * account leaves the public profile standing.
+     */
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $user = null;
 
     #[ORM\Column]
     private bool $active = true;
@@ -200,6 +209,18 @@ class Trainer
     public function setBranch(?Branch $branch): static
     {
         $this->branch = $branch;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

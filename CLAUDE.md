@@ -137,13 +137,31 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 - `.gitattributes` enforces **LF**. Python's `pathlib.write_text` emits CRLF on Windows unless
   you pass `newline='
 '`, and php-cs-fixer then rewrites the whole file. Check with
-  `grep -qU $''` before committing.
+  `grep -qU $'
+'` before committing.
 - `bin/console cache:clear` regularly exceeds two minutes on this machine. `rm -rf var/cache/dev`
   followed by `cache:warmup --env=dev` does the same job in seconds.
 - `lines` is a **reserved word in MySQL 8.4**, like `interval`. Alias it in ad-hoc `dbal:run-sql`.
 - The working copy lives at **`C:\dev\gym-proj`**, deliberately outside OneDrive — `vendor/`,
   `.venv/` and the 107 MB Tailwind binary in `app/var/` come to ~350 MB and used to sync on
   every build. Do not move it back under `OneDrive\Desktop`.
+- `UserInterface::eraseCredentials()` is deprecated as of Symfony 7.3, and `AuthenticatorManager`
+  triggers that deprecation unless the method carries **`#[\Deprecated]`**. With
+  `failOnDeprecation="true"` in phpunit.dist.xml, forgetting it fails every form-login test.
+- **Constraint messages live in the `validators` domain**, never in `messages`. The Validator
+  component translates violations itself, so a key left in `messages` renders on screen as the
+  raw key. `translations/validators.*.yaml` holds them.
+- Symfony answers an **invalid form submission with 422**, not 200. Controller tests must assert
+  `assertResponseStatusCodeSame(422)`, not `assertResponseIsSuccessful()`.
+- **Stateless CSRF** (`config/packages/csrf.yaml`) validates same-origin signals, so
+  `csrf_token('...')` renders the literal string `csrf-token` and the optional JS swaps in a
+  random value. In BrowserKit tests a `Referer` only exists once the history is non-empty, so a
+  synthesised POST needs a GET before it.
+- A **Twig comment inside a hash literal** is a parse error. Put `{# ... #}` above the expression,
+  not between a hash's keys.
+- Anything that renders a **password field wants a username field beside it**, even a hidden one,
+  or Chrome logs a console warning. Name it outside the form type's namespace so the form does
+  not see it as an extra field.
 
 ## Status
 
@@ -152,8 +170,8 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 | M0 | Foundation — framework, assets, i18n, Docker, CI | done |
 | M1 | Domain model, migrations, fixtures, back office | done |
 | M2 | Public site, Leaflet branch map, SVG floor plan | done |
-| M3 | Accounts, memberships, Stripe test checkout | **next** |
-| M4 | Shop — catalogue, cart, orders | planned |
+| M3 | Accounts, memberships, Stripe test checkout | done |
+| M4 | Shop — catalogue, cart, orders | **next** |
 | M5 | Trainers, availability, booking, messaging | planned |
 | M6 | Assessment, rule engine, LLM layer, PDF export | planned |
 | M7 | Coverage, docs, screenshots | planned |
@@ -178,9 +196,23 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   fixed marker, because a doorway is not a room. `EquipmentType::FIXTURE` is the one case that
   is not exercise equipment - it is how amenity rooms list lockers and saunas.
 
-### Known placeholder
+### Accounts and payments (M3)
 
-`/admin` sits behind HTTP basic auth against a single in-memory account (`admin` /
-`speks-dev`) defined in `config/packages/security.yaml`. **M3 replaces this** with a real
-`User` entity, roles and a form login. `Trainer` has no `user` relation yet for the same
-reason.
+- **One firewall** covers the whole site. Staff are ordinary `User` rows carrying
+  `ROLE_ADMIN`; `/admin` is gated by `access_control`, not by a second login. The M1
+  in-memory provider, the `admin` firewall and `ADMIN_PASSWORD_HASH` are all gone.
+- **`User`** is table `app_user` (`user` is a keyword in too many engines). `getRoles()`
+  always appends `ROLE_USER`, so the column stores extra roles only.
+- **`UserMembership`** is a membership somebody holds, as opposed to `MembershipPlan`,
+  which is the tier on the price list. It copies the price in at purchase, so repricing a
+  tier never rewrites what past members were charged.
+- **Only the Stripe webhook may activate a membership.** Checkout writes a PENDING row and
+  hands off; `/webhook/stripe` verifies the signature and promotes it. The success page can
+  legitimately show PENDING, because the webhook is a separate connection that can land
+  after the browser redirect.
+- **Empty Stripe keys are a supported state**, not a broken one - it is how a fresh clone
+  and CI both run. `StripeCheckout::isConfigured()` gates every call, and the membership
+  page says checkout is unavailable instead of rendering a dead button. Test it that way;
+  a live-key run is Andrii's alone.
+- Fixtures seed `admin@speks.lv`, `member@speks.lv` and `prospect@speks.lv`, all with
+  password `speks-dev`.

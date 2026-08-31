@@ -1,0 +1,17 @@
+{#
+   Flash messages. The bag holds translation keys rather than finished text,
+   so a message queued in one request still renders in the language of the
+   request that finally shows it.
+#}
+{% set styles = {
+    'success': 'border-signal-500/40 bg-signal-500/10 text-signal-500',
+    'error': 'border-red-500/40 bg-red-500/10 text-red-300',
+} %}
+
+{% for type, messages in app.flashes(['success', 'error']) %}
+    {% for message in messages %}
+        <div role="status" class="mb-4 rounded-lg border px-4 py-3 text-sm {{ styles[type] ?? styles.success }}">
+            {{ message|trans }}
+        </div>
+    {% endfor %}
+{% endfor %}

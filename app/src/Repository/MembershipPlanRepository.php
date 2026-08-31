@@ -29,4 +29,18 @@ class MembershipPlanRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * The plan behind a checkout request. A retired tier returns null, so a
+     * stale bookmark cannot buy something that is no longer on sale.
+     */
+    public function findOneActiveBySlug(string $slug): ?MembershipPlan
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.slug = :slug')
+            ->andWhere('p.active = true')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

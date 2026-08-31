@@ -9,3 +9,6 @@ framework:
             - submit
             - authenticate
             - logout
+            # The buy button on /{_locale}/memberships. Hand-written rather than
+            # a form type, so it carries its own token id.
+            - checkout

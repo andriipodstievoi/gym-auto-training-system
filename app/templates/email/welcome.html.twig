@@ -1,0 +1,18 @@
+{% extends 'email/_layout.html.twig' %}
+
+{% block subject %}{{ 'email.welcome.subject'|trans({}, 'messages', locale) }}{% endblock %}
+
+{% block content %}
+    <p style="margin:0 0 16px;font-size:20px;font-weight:bold;color:#ffffff;">
+        {{ 'email.welcome.heading'|trans({'%name%': user.firstName}, 'messages', locale) }}
+    </p>
+
+    <p style="margin:0 0 16px;">{{ 'email.welcome.body'|trans({}, 'messages', locale) }}</p>
+
+    <p style="margin:24px 0 0;">
+        <a href="{{ url('membership_index', {'_locale': locale}) }}"
+           style="display:inline-block;background:#84cc16;color:#18181b;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">
+            {{ 'email.welcome.cta'|trans({}, 'messages', locale) }}
+        </a>
+    </p>
+{% endblock %}

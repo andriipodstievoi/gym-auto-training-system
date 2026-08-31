@@ -39,6 +39,9 @@ final class TrainerCrudController extends AbstractCrudController
         yield TextField::new('fullName');
         yield SlugField::new('slug')->setTargetFieldName('fullName')->hideOnIndex();
         yield AssociationField::new('branch');
+        yield AssociationField::new('user')
+            ->setHelp('Optional. Links this coach to a login, which they need from M5 onwards.')
+            ->hideOnIndex();
         yield ChoiceField::new('specialities')
             ->setChoices(self::specialityChoices())
             ->allowMultipleChoices();

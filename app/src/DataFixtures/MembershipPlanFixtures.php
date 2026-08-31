@@ -15,11 +15,16 @@ use Doctrine\Persistence\ObjectManager;
  */
 final class MembershipPlanFixtures extends Fixture
 {
+    public const string REFERENCE_SINGLE_BRANCH = 'plan-single-branch';
+    public const string REFERENCE_ALL_BRANCHES = 'plan-all-branches';
+    public const string REFERENCE_ANNUAL = 'plan-annual';
+
     public function load(ObjectManager $manager): void
     {
         $plans = [
             [
                 'slug' => 'single-branch',
+                'reference' => self::REFERENCE_SINGLE_BRANCH,
                 'name' => TranslatedString::of('Single branch', 'Viena filiāle', 'Один филиал'),
                 'description' => TranslatedString::of(
                     'Full access to the branch of your choice, any time it is open.',
@@ -38,6 +43,7 @@ final class MembershipPlanFixtures extends Fixture
             ],
             [
                 'slug' => 'all-branches',
+                'reference' => self::REFERENCE_ALL_BRANCHES,
                 'name' => TranslatedString::of('All branches', 'Visas filiāles', 'Все филиалы'),
                 'description' => TranslatedString::of(
                     'Train at every SPĒKS location in Riga, plus one coaching session each month.',
@@ -57,6 +63,7 @@ final class MembershipPlanFixtures extends Fixture
             ],
             [
                 'slug' => 'annual',
+                'reference' => self::REFERENCE_ANNUAL,
                 'name' => TranslatedString::of('Annual', 'Gada abonements', 'Годовой'),
                 'description' => TranslatedString::of(
                     'Twelve months of all-branch access, paid once - two months cheaper than paying monthly.',
@@ -77,17 +84,18 @@ final class MembershipPlanFixtures extends Fixture
         ];
 
         foreach ($plans as $data) {
-            $manager->persist(
-                (new MembershipPlan())
-                    ->setSlug($data['slug'])
-                    ->setName($data['name'])
-                    ->setDescription($data['description'])
-                    ->setPriceCents($data['priceCents'])
-                    ->setBillingInterval($data['interval'])
-                    ->setAllBranches($data['allBranches'])
-                    ->setPosition($data['position'])
-                    ->setFeatures($data['features'])
-            );
+            $plan = (new MembershipPlan())
+                ->setSlug($data['slug'])
+                ->setName($data['name'])
+                ->setDescription($data['description'])
+                ->setPriceCents($data['priceCents'])
+                ->setBillingInterval($data['interval'])
+                ->setAllBranches($data['allBranches'])
+                ->setPosition($data['position'])
+                ->setFeatures($data['features']);
+
+            $manager->persist($plan);
+            $this->addReference($data['reference'], $plan);
         }
 
         $manager->flush();

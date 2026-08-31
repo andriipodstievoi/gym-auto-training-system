@@ -1,0 +1,14 @@
+# Ierobežojumu pārkāpumu ziņojumi. Validator komponente tos vienmēr tulko
+# "validators" domēnā, nevis "messages".
+register:
+    error:
+        email_taken: "Konts ar šo e-pastu jau pastāv."
+        password_mismatch: "Abas paroles nesakrīt."
+        password_blank: "Lūdzu, izvēlies paroli."
+        password_short: "Izmanto vismaz 8 rakstzīmes."
+        password_weak: "Šo paroli ir pārāk viegli uzminēt. Izvēlies garāku."
+
+account:
+    password:
+        error:
+            current_wrong: "Šī nav tava pašreizējā parole."

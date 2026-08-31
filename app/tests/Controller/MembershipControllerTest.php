@@ -12,6 +12,22 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 final class MembershipControllerTest extends WebTestCase
 {
+    /**
+     * These tests describe the page as it renders with no Stripe keys, which
+     * is how a fresh clone and CI both run. Set them explicitly so the class
+     * does not inherit whatever {@see CheckoutControllerTest} left behind.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        self::ensureKernelShutdown();
+
+        foreach (['STRIPE_SECRET_KEY', 'STRIPE_PUBLIC_KEY', 'STRIPE_WEBHOOK_SECRET'] as $name) {
+            $_ENV[$name] = '';
+            $_SERVER[$name] = '';
+        }
+    }
+
     #[DataProvider('localeProvider')]
     public function testEveryActivePlanIsListedInEveryLocale(string $locale, string $expected): void
     {
@@ -64,14 +80,18 @@ final class MembershipControllerTest extends WebTestCase
     }
 
     /**
-     * Checkout is M3, so the page must not pretend to sell anything yet.
+     * With no Stripe keys the page must still render in full, and offer
+     * nothing to click. The rest of the checkout behaviour, configured and
+     * not, lives in {@see CheckoutControllerTest}.
      */
-    public function testNothingOnThePageTriesToTakeMoney(): void
+    public function testWithNoStripeKeysThePageSellsNothing(): void
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/en/memberships');
 
+        self::assertResponseIsSuccessful();
+        self::assertCount(3, $crawler->filter('article'));
         self::assertCount(0, $crawler->filter('form'));
-        self::assertSelectorTextContains('body', 'Online checkout is coming soon');
+        self::assertSelectorTextContains('body', 'Checkout unavailable');
     }
 }

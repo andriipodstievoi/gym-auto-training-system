@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% set locale = app.request.locale %}
+
+{% block title %}{{ 'checkout.success.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'checkout.success.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-2xl px-4 py-16 text-center">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-signal-500">{{ 'checkout.success.kicker'|trans }}</p>
+        <h1 class="mt-3 text-4xl font-black text-white">{{ 'checkout.success.title'|trans }}</h1>
+
+        {% if membership %}
+            <p class="mt-4 text-lg text-iron-200">
+                {{ 'checkout.success.lead'|trans({'%plan%': membership.plan.name.get(locale)}) }}
+            </p>
+
+            {#
+               The webhook is a separate connection from Stripe and can land
+               after this redirect, so the row may still be pending. Say that
+               plainly rather than showing an activation that has not happened.
+            #}
+            {% if membership.status.value == 'pending' %}
+                <p class="mt-6 rounded-xl border border-iron-800 bg-iron-800/40 px-6 py-4 text-sm text-iron-300">
+                    {{ 'checkout.success.confirming'|trans }}
+                </p>
+            {% endif %}
+        {% else %}
+            <p class="mt-4 text-lg text-iron-200">{{ 'checkout.success.unknown'|trans }}</p>
+        {% endif %}
+
+        <a href="{{ path('app_account') }}"
+           class="mt-8 inline-block rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+            {{ 'checkout.success.to_account'|trans }}
+        </a>
+    </section>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'email/_layout.html.twig' %}
+
+{% block subject %}{{ 'email.membership.subject'|trans({}, 'messages', locale) }}{% endblock %}
+
+{% block content %}
+    <p style="margin:0 0 16px;font-size:20px;font-weight:bold;color:#ffffff;">
+        {{ 'email.membership.heading'|trans({}, 'messages', locale) }}
+    </p>
+
+    <p style="margin:0 0 20px;">
+        {{ 'email.membership.body'|trans({'%plan%': membership.plan.name.get(locale)}, 'messages', locale) }}
+    </p>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;font-size:14px;">
+        <tr>
+            <td style="padding:6px 0;color:#a1a1aa;">{{ 'account.membership.paid'|trans({}, 'messages', locale) }}</td>
+            <td style="padding:6px 0;text-align:right;color:#ffffff;font-weight:bold;">
+                {{ (membership.pricePaidCents / 100)|format_currency('EUR', locale=locale) }}
+            </td>
+        </tr>
+        {% if membership.startsAt %}
+            <tr>
+                <td style="padding:6px 0;color:#a1a1aa;">{{ 'account.membership.started'|trans({}, 'messages', locale) }}</td>
+                <td style="padding:6px 0;text-align:right;color:#ffffff;font-weight:bold;">
+                    {{ membership.startsAt|format_date('medium', locale=locale) }}
+                </td>
+            </tr>
+        {% endif %}
+        {% if membership.endsAt %}
+            <tr>
+                <td style="padding:6px 0;color:#a1a1aa;">{{ 'account.membership.renews'|trans({}, 'messages', locale) }}</td>
+                <td style="padding:6px 0;text-align:right;color:#ffffff;font-weight:bold;">
+                    {{ membership.endsAt|format_date('medium', locale=locale) }}
+                </td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <p style="margin:24px 0 0;">
+        <a href="{{ url('app_account', {'_locale': locale}) }}"
+           style="display:inline-block;background:#84cc16;color:#18181b;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">
+            {{ 'email.membership.cta'|trans({}, 'messages', locale) }}
+        </a>
+    </p>
+{% endblock %}

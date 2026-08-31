@@ -1,0 +1,16 @@
+{% set current_route = app.request.attributes.get('_route') %}
+{% set tabs = [
+    { route: 'app_account', key: 'account.nav.overview' },
+    { route: 'app_account_profile', key: 'account.nav.profile' },
+] %}
+
+<nav aria-label="{{ 'account.nav.label'|trans }}" class="mt-6 flex gap-1 border-b border-iron-800">
+    {% for tab in tabs %}
+        {% set active = current_route == tab.route %}
+        <a href="{{ path(tab.route) }}"
+           class="-mb-px border-b-2 px-4 py-2.5 text-sm font-medium {{ active ? 'border-signal-500 text-signal-500' : 'border-transparent text-iron-400 hover:text-white' }}"
+           {{ active ? 'aria-current="page"' : '' }}>
+            {{ tab.key|trans }}
+        </a>
+    {% endfor %}
+</nav>
