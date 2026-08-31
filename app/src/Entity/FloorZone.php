@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Doctrine\Type\TranslatedStringType;
+use App\Domain\Enum\ZoneKind;
 use App\Domain\TranslatedString;
 use App\Repository\FloorZoneRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -48,6 +49,17 @@ class FloorZone
 
     #[ORM\Column]
     private int $position = 0;
+
+    /**
+     * Which storey the zone sits on. 0 is the ground floor; the lounge and
+     * spa live upstairs, which is why the plan is drawn one floor at a time.
+     */
+    #[ORM\Column]
+    #[Assert\PositiveOrZero]
+    private int $floor = 0;
+
+    #[ORM\Column(enumType: ZoneKind::class, length: 16)]
+    private ZoneKind $kind = ZoneKind::TRAINING;
 
     /** @var Collection<int, Equipment> */
     #[ORM\OneToMany(targetEntity: Equipment::class, mappedBy: 'zone', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -123,6 +135,45 @@ class FloorZone
         $this->position = $position;
 
         return $this;
+    }
+
+    public function getFloor(): int
+    {
+        return $this->floor;
+    }
+
+    public function setFloor(int $floor): static
+    {
+        $this->floor = $floor;
+
+        return $this;
+    }
+
+    public function getKind(): ZoneKind
+    {
+        return $this->kind;
+    }
+
+    public function setKind(ZoneKind $kind): static
+    {
+        $this->kind = $kind;
+
+        return $this;
+    }
+
+    /**
+     * Total pieces standing in the zone, counting every unit rather than
+     * every line - six racks are six things on the plan, not one.
+     */
+    public function getUnitCount(): int
+    {
+        $total = 0;
+
+        foreach ($this->equipment as $item) {
+            $total += $item->getQuantity();
+        }
+
+        return $total;
     }
 
     /**

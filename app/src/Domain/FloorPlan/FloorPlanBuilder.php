@@ -5,87 +5,66 @@ declare(strict_types=1);
 namespace App\Domain\FloorPlan;
 
 /**
- * Lays a branch's floor zones out as a plan instead of shipping a drawing.
+ * Lays one storey of a branch out as a plan instead of shipping a drawing.
  *
  * A hand-drawn SVG would only ever fit the branches that existed the day it
- * was drawn; the back office can add a fourth branch with six zones. So the
- * plan is generated: the entrance side of the building is fixed, and the
- * training floor is divided between however many zones the branch has, in two
- * columns, with an odd last zone spanning the width.
+ * was drawn; the back office can add a fourth branch with six zones, or move
+ * the spa downstairs. So the plan is generated: the storey's rooms are tiled
+ * across the building, and each room carries its zone's
+ * {@see \App\Entity\FloorZone::$svgId}, which is what the template hangs the
+ * element id and the click handler on.
  *
- * Each room carries its zone's {@see \App\Entity\FloorZone::$svgId}, which is
- * what the template hangs the id and the click handler on.
+ * Every room on the plan is a real zone - changing rooms and reception
+ * included - so every one of them is clickable, translatable and editable in
+ * the back office. Only the entrance stays a fixed marker, because a doorway
+ * is not a room anyone can walk into and look at.
  */
 final class FloorPlanBuilder
 {
-    public const int AREA_LEFT = 220;
-    public const int AREA_TOP = 20;
-    public const int AREA_WIDTH = 640;
-    public const int AREA_HEIGHT = 480;
+    public const int AREA_LEFT = 24;
+    public const int AREA_TOP = 24;
+    public const int AREA_WIDTH = 832;
+    public const int AREA_HEIGHT = 456;
 
-    private const int GAP = 16;
-    private const int COLUMNS = 2;
+    private const int GAP = 14;
 
     /**
-     * The reception side, which every branch has and none of which is clickable.
-     *
-     * @var list<array{string, int, int, int, int}>
+     * Two columns reads well up to four rooms; beyond that they get too tall
+     * and thin, so a busier storey goes to three.
      */
-    private const array SERVICE_ROOMS = [
-        ['changing-rooms', 20, 20, 180, 234],
-        ['reception', 20, 270, 180, 114],
-        ['entrance', 20, 400, 180, 100],
-    ];
+    private const int WIDE_LAYOUT_THRESHOLD = 4;
 
     /**
-     * @param list<string> $svgIds one per floor zone, in display order
+     * @param list<string> $svgIds one per zone on this storey, in display order
      */
     public function build(array $svgIds): FloorPlan
-    {
-        return new FloorPlan($this->layOutTrainingFloor($svgIds), $this->serviceRooms());
-    }
-
-    /**
-     * @param list<string> $svgIds
-     *
-     * @return list<FloorPlanRoom>
-     */
-    private function layOutTrainingFloor(array $svgIds): array
     {
         $count = count($svgIds);
 
         if (0 === $count) {
-            return [];
+            return new FloorPlan([]);
         }
 
-        $rows = (int) ceil($count / self::COLUMNS);
+        $columns = $count <= self::WIDE_LAYOUT_THRESHOLD ? 2 : 3;
+        $rows = (int) ceil($count / $columns);
+
         $rooms = [];
 
         foreach ($svgIds as $index => $svgId) {
-            $row = intdiv($index, self::COLUMNS);
+            $row = intdiv($index, $columns);
+
+            // A row shares the width between however many rooms actually
+            // landed on it, so a lone last room spans the floor rather than
+            // leaving a hole where a neighbour would have been.
+            $onThisRow = min($columns, $count - $row * $columns);
+
             [$y, $height] = $this->slice(self::AREA_TOP, self::AREA_HEIGHT, $row, $rows);
-
-            // A lone zone on the final row gets the whole width rather than
-            // leaving a gap where a second room would have been.
-            $isLastAndAlone = $index === $count - 1 && 0 !== $count % self::COLUMNS;
-
-            if ($isLastAndAlone) {
-                $rooms[] = new FloorPlanRoom($svgId, self::AREA_LEFT, $y, self::AREA_WIDTH, $height);
-
-                continue;
-            }
-
-            [$x, $width] = $this->slice(
-                self::AREA_LEFT,
-                self::AREA_WIDTH,
-                $index % self::COLUMNS,
-                self::COLUMNS,
-            );
+            [$x, $width] = $this->slice(self::AREA_LEFT, self::AREA_WIDTH, $index % $columns, $onThisRow);
 
             $rooms[] = new FloorPlanRoom($svgId, $x, $y, $width, $height);
         }
 
-        return $rooms;
+        return new FloorPlan($rooms);
     }
 
     /**
@@ -103,16 +82,5 @@ final class FloorPlanBuilder
         $end = intdiv($span * ($index + 1), $of);
 
         return [$origin + $start, $end - $start - self::GAP];
-    }
-
-    /**
-     * @return list<FloorPlanRoom>
-     */
-    private function serviceRooms(): array
-    {
-        return array_map(
-            static fn (array $room): FloorPlanRoom => new FloorPlanRoom(...$room),
-            self::SERVICE_ROOMS,
-        );
     }
 }

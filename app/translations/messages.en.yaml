@@ -75,15 +75,22 @@ branch:
         closed: "Closed"
         contact: "Contact"
         plan_title: "Floor plan"
-        plan_lead: "Pick a zone to see what stands in it."
+        plan_lead: "Pick a room to see everything in it, machine by machine."
         plan_empty: "The floor plan for this branch has not been published yet."
         equipment: "In this zone"
         trainers: "Coaches at this branch"
         trainers_empty: "No coaches are assigned to this branch yet."
     plan:
         entrance: "Entrance"
-        reception: "Reception"
-        changing-rooms: "Changing rooms"
+        storeys: "Storeys"
+        floor:
+            '0': "Ground floor"
+            '1': "Upper floor"
+        floor_n: "Floor %number%"
+        rooms: "Rooms on this floor"
+        back: "Back to the floor plan"
+        detail_of: "Detailed plan of %zone%"
+        empty_room: "Nothing is listed in this room yet."
 
 equipment:
     type:
@@ -95,6 +102,7 @@ equipment:
         band: "Bands"
         bodyweight: "Bodyweight"
         cardio: "Cardio"
+        fixture: "Fitting"
 
 membership:
     index:

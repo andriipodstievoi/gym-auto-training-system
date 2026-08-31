@@ -161,7 +161,15 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   API key configured. PAR-Q+ red-flag screening gates every plan and is already live in
   `ai-service`.
 - **Gym map:** both a Leaflet/OpenStreetMap map of Riga branches and a clickable SVG floor
-  plan driven by `FloorZone.svgId`.
+  plan driven by `FloorZone.svgId`. The plan is **generated, not drawn**: `FloorPlanBuilder`
+  tiles one storey's rooms, `ZoneLayoutBuilder` places every individual machine inside a room.
+  Hand-authored coordinates were rejected - they would only describe the branches that existed
+  the day somebody typed them, and there is no editor to move them afterwards.
+- **Floor zones:** every room is a `FloorZone`, changing rooms and reception included, so all
+  of them are clickable, translated and editable. `floor` picks the storey (lounge and spa are
+  upstairs) and `kind` separates training floors from amenity rooms. Only the entrance is a
+  fixed marker, because a doorway is not a room. `EquipmentType::FIXTURE` is the one case that
+  is not exercise equipment - it is how amenity rooms list lockers and saunas.
 
 ### Known placeholder
 

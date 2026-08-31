@@ -69,7 +69,6 @@
         {% if zones is empty %}
             <p class="mt-3 text-iron-400">{{ 'branch.show.plan_empty'|trans }}</p>
         {% else %}
-            <p class="mt-2 text-sm text-iron-400">{{ 'branch.show.plan_lead'|trans }}</p>
             {% include 'branch/_floor_plan.html.twig' %}
         {% endif %}
     </section>

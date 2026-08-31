@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\DataFixtures;
 
 use App\Domain\Enum\EquipmentType;
+use App\Domain\Enum\ZoneKind;
 use App\Domain\TranslatedString;
 use App\Entity\Branch;
 use App\Entity\Equipment;
@@ -16,8 +17,13 @@ use Doctrine\Persistence\ObjectManager;
  * Three Riga branches, each with its floor zones and equipment.
  *
  * Addresses and coordinates are plausible Riga locations chosen so the Leaflet
- * map in M2 has a realistic spread across the city; swap them for the real
- * ones when they are known.
+ * map has a realistic spread across the city; swap them for the real ones when
+ * they are known.
+ *
+ * Every branch also gets the rooms in {@see SHARED_AMENITIES}: changing rooms,
+ * a reception, and a lounge and spa on the upper storey. They are real zones
+ * rather than shapes drawn into the plan, so they are clickable, translated
+ * and editable like any training floor.
  */
 final class BranchFixtures extends Fixture
 {
@@ -38,6 +44,44 @@ final class BranchFixtures extends Fixture
         5 => ['open' => '06:00', 'close' => '22:00'],
         6 => ['open' => '08:00', 'close' => '21:00'],
         7 => ['open' => '09:00', 'close' => '20:00'],
+    ];
+
+    /**
+     * The rooms every branch has, whatever its training floor looks like.
+     * Contents are {@see EquipmentType::FIXTURE} throughout - a locker is not
+     * something anybody trains on.
+     *
+     * Shaped as [svgId, floor, en, lv, ru, [[itemEn, itemLv, itemRu, qty], ...]].
+     *
+     * @var list<array{string, int, string, string, string, list<array{string, string, string, int}>}>
+     */
+    private const array SHARED_AMENITIES = [
+        ['changing-men', 0, "Men's changing room", 'Vīriešu ģērbtuve', 'Мужская раздевалка', [
+            ['Lockers', 'Skapīši', 'Шкафчики', 24],
+            ['Showers', 'Dušas', 'Душевые', 8],
+            ['Benches', 'Soliņi', 'Скамьи', 6],
+        ]],
+        ['changing-women', 0, "Women's changing room", 'Sieviešu ģērbtuve', 'Женская раздевалка', [
+            ['Lockers', 'Skapīši', 'Шкафчики', 24],
+            ['Showers', 'Dušas', 'Душевые', 8],
+            ['Benches', 'Soliņi', 'Скамьи', 6],
+        ]],
+        ['reception', 0, 'Reception', 'Reģistratūra', 'Ресепшн', [
+            ['Reception desk', 'Reģistratūras lete', 'Стойка ресепшн', 1],
+            ['Shop counter', 'Veikala lete', 'Витрина магазина', 1],
+            ['Water station', 'Ūdens punkts', 'Питьевая станция', 2],
+        ]],
+        ['lounge', 1, 'Lounge', 'Atpūtas zona', 'Лаундж', [
+            ['Lounge seating', 'Atpūtas sēdvietas', 'Мягкие кресла', 12],
+            ['Coffee bar', 'Kafijas bārs', 'Кофе-бар', 1],
+            ['Work tables', 'Darba galdi', 'Рабочие столы', 4],
+        ]],
+        ['spa', 1, 'Spa', 'SPA zona', 'СПА-зона', [
+            ['Finnish sauna', 'Somu pirts', 'Финская сауна', 1],
+            ['Steam room', 'Tvaika pirts', 'Хамам', 1],
+            ['Plunge pool', 'Atvēsināšanās baseins', 'Купель', 1],
+            ['Relaxation loungers', 'Atpūtas krēsli', 'Шезлонги', 6],
+        ]],
     ];
 
     public function load(ObjectManager $manager): void
@@ -158,6 +202,8 @@ final class BranchFixtures extends Fixture
                 $zone = (new FloorZone())
                     ->setSvgId($svgId)
                     ->setName(TranslatedString::of($en, $lv, $ru))
+                    ->setKind(ZoneKind::TRAINING)
+                    ->setFloor(0)
                     ->setPosition($position);
 
                 foreach ($items as [$itemEn, $itemLv, $itemRu, $type, $quantity]) {
@@ -165,6 +211,28 @@ final class BranchFixtures extends Fixture
                         (new Equipment())
                             ->setName(TranslatedString::of($itemEn, $itemLv, $itemRu))
                             ->setType($type)
+                            ->setQuantity($quantity)
+                    );
+                }
+
+                $branch->addFloorZone($zone);
+            }
+
+            $position = count($data['zones']);
+
+            foreach (self::SHARED_AMENITIES as [$svgId, $floor, $en, $lv, $ru, $items]) {
+                $zone = (new FloorZone())
+                    ->setSvgId($svgId)
+                    ->setName(TranslatedString::of($en, $lv, $ru))
+                    ->setKind(ZoneKind::AMENITY)
+                    ->setFloor($floor)
+                    ->setPosition($position++);
+
+                foreach ($items as [$itemEn, $itemLv, $itemRu, $quantity]) {
+                    $zone->addEquipment(
+                        (new Equipment())
+                            ->setName(TranslatedString::of($itemEn, $itemLv, $itemRu))
+                            ->setType(EquipmentType::FIXTURE)
                             ->setQuantity($quantity)
                     );
                 }

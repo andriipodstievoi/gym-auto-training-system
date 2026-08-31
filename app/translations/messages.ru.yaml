@@ -75,15 +75,22 @@ branch:
         closed: "Закрыто"
         contact: "Контакты"
         plan_title: "План зала"
-        plan_lead: "Выбери зону, чтобы увидеть, что в ней стоит."
+        plan_lead: "Выбери помещение, чтобы увидеть каждый его тренажёр."
         plan_empty: "План этого зала ещё не опубликован."
         equipment: "В этой зоне"
         trainers: "Тренеры этого филиала"
         trainers_empty: "К этому филиалу пока не привязан ни один тренер."
     plan:
         entrance: "Вход"
-        reception: "Ресепшн"
-        changing-rooms: "Раздевалки"
+        storeys: "Этажи"
+        floor:
+            '0': "Первый этаж"
+            '1': "Второй этаж"
+        floor_n: "Этаж %number%"
+        rooms: "Помещения на этом этаже"
+        back: "Назад к плану зала"
+        detail_of: "Подробный план: %zone%"
+        empty_room: "В этом помещении пока ничего не указано."
 
 equipment:
     type:
@@ -95,6 +102,7 @@ equipment:
         band: "Резина"
         bodyweight: "Свой вес"
         cardio: "Кардио"
+        fixture: "Оборудование"
 
 membership:
     index:

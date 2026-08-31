@@ -22,6 +22,9 @@ class FloorZoneRepository extends ServiceEntityRepository
     /**
      * Zones of one branch with their equipment, ready for the clickable plan.
      *
+     * Ordered by storey first, so the caller can group straight into floors
+     * without sorting again.
+     *
      * @return list<FloorZone>
      */
     public function findForBranchWithEquipment(Branch $branch): array
@@ -31,7 +34,8 @@ class FloorZoneRepository extends ServiceEntityRepository
             ->leftJoin('z.equipment', 'e')
             ->andWhere('z.branch = :branch')
             ->setParameter('branch', $branch)
-            ->orderBy('z.position', 'ASC')
+            ->orderBy('z.floor', 'ASC')
+            ->addOrderBy('z.position', 'ASC')
             ->getQuery()
             ->getResult();
     }

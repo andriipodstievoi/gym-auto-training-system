@@ -1,76 +1,179 @@
 {#
-   The clickable plan. Geometry comes from App\Domain\FloorPlan\FloorPlanBuilder,
-   which returns one room per floor zone in zone order, so rooms and zones pair
-   up by index. Each room carries its zone's svgId as the element id, which is
-   what ties a shape in the drawing to a row in the database.
+   The clickable plan, one storey at a time.
 
-   Without JavaScript every zone's equipment list is simply shown at once.
+   Geometry comes from App\Domain\FloorPlan: FloorPlanBuilder returns one room
+   per zone in zone order, so rooms and zones pair up by index, and
+   ZoneLayoutBuilder places every individual machine for the detail view. Each
+   room carries its zone's svgId as the element id, which is what ties a shape
+   in the drawing to a row in the database.
+
+   Alpine holds two pieces of state: which storey is showing, and which zone -
+   if any - is open. With no JavaScript the overview of every storey and the
+   detail of every room are simply all shown at once.
 #}
 {% set locale = app.request.locale %}
 
-<div x-data="{ active: '{{ (zones|first).svgId }}' }" class="mt-8 grid gap-8 lg:grid-cols-[3fr_2fr]">
-    <figure class="m-0">
-        <svg viewBox="{{ constant('VIEW_BOX', plan) }}" role="group"
-             aria-label="{{ 'branch.show.plan_title'|trans }}"
-             class="w-full rounded-xl border border-iron-800 bg-iron-900">
-            <rect x="4" y="4" width="872" height="512" rx="14"
-                  class="fill-iron-800/30 stroke-iron-800" stroke-width="2"/>
+{% set roomFill = {
+    'training': 'fill-iron-800 stroke-iron-600',
+    'amenity': 'fill-iron-800/40 stroke-iron-800',
+} %}
 
-            {% for room in plan.serviceRooms %}
-                <g>
-                    <rect x="{{ room.x }}" y="{{ room.y }}" width="{{ room.width }}" height="{{ room.height }}"
-                          rx="8" class="fill-iron-800/50 stroke-iron-800" stroke-width="2"/>
-                    <text x="{{ room.centreX }}" y="{{ room.centreY }}" text-anchor="middle" dominant-baseline="middle"
-                          class="fill-iron-400 text-[15px]">{{ ('branch.plan.' ~ room.svgId)|trans }}</text>
-                </g>
+{% set machineFill = {
+    'barbell': 'fill-signal-500/70',
+    'dumbbell': 'fill-signal-400/60',
+    'machine': 'fill-iron-400/70',
+    'cable': 'fill-iron-400/50',
+    'kettlebell': 'fill-signal-600/70',
+    'band': 'fill-signal-400/40',
+    'bodyweight': 'fill-iron-200/50',
+    'cardio': 'fill-signal-500/45',
+    'fixture': 'fill-iron-600/70',
+} %}
+
+<div x-data="{ floor: {{ (floors|first).number }}, open: null }" class="mt-6">
+    {% if floors|length > 1 %}
+        <div class="flex flex-wrap gap-2" role="tablist" aria-label="{{ 'branch.plan.storeys'|trans }}">
+            {% for storey in floors %}
+                {% set key = 'branch.plan.floor.' ~ storey.number %}
+                {% set label = key|trans %}
+                {% if label == key %}{% set label = 'branch.plan.floor_n'|trans({'%number%': storey.number}) %}{% endif %}
+
+                <button type="button" role="tab"
+                        @click="floor = {{ storey.number }}; open = null"
+                        :aria-selected="floor === {{ storey.number }} ? 'true' : 'false'"
+                        class="rounded-lg border px-4 py-2 text-sm font-semibold transition"
+                        :class="floor === {{ storey.number }}
+                            ? 'border-signal-500 bg-signal-500/15 text-signal-500'
+                            : 'border-iron-800 text-iron-200 hover:border-iron-600 hover:text-white'">
+                    {{ label }}
+                </button>
             {% endfor %}
+        </div>
+    {% endif %}
 
-            {% for index, room in plan.trainingRooms %}
-                {% set zone = zones[index] %}
-                <g role="button" tabindex="0"
-                   class="cursor-pointer focus:outline-none"
-                   aria-label="{{ zone.name.get(locale) }}"
-                   :aria-pressed="active === '{{ zone.svgId }}'"
-                   @click="active = '{{ zone.svgId }}'"
-                   @keydown.enter.prevent="active = '{{ zone.svgId }}'"
-                   @keydown.space.prevent="active = '{{ zone.svgId }}'">
-                    <rect id="zone-{{ zone.svgId }}"
-                          x="{{ room.x }}" y="{{ room.y }}" width="{{ room.width }}" height="{{ room.height }}"
-                          rx="10" stroke-width="2"
-                          class="fill-iron-800 stroke-iron-600 transition-colors hover:fill-iron-600/40"
-                          :class="active === '{{ zone.svgId }}' ? 'fill-signal-500/25 stroke-signal-500' : 'fill-iron-800 stroke-iron-600 hover:fill-iron-600/40'"/>
+    {# ---------------------------------------------------------------- overview #}
+    <div x-show="open === null" class="mt-5 grid gap-8 lg:grid-cols-[3fr_2fr]">
+        <div>
+            {% for storey in floors %}
+                <div x-show="floor === {{ storey.number }}">
+                    <svg viewBox="{{ constant('VIEW_BOX', storey.plan) }}" role="group"
+                         aria-label="{{ 'branch.show.plan_title'|trans }}"
+                         class="w-full rounded-xl border border-iron-800 bg-iron-900">
+                        <rect x="4" y="4" width="872" height="512" rx="14"
+                              class="fill-iron-800/20 stroke-iron-800" stroke-width="2"/>
 
-                    <text x="{{ room.centreX }}" y="{{ room.centreY - 12 }}" text-anchor="middle" dominant-baseline="middle"
-                          class="pointer-events-none fill-white text-[19px] font-bold">{{ zone.name.get(locale) }}</text>
-                </g>
+                        {% for index, room in storey.plan.rooms %}
+                            {% set zone = storey.zones[index] %}
+                            <g role="button" tabindex="0"
+                               class="cursor-pointer focus:outline-none"
+                               aria-label="{{ zone.name.get(locale) }}"
+                               @click="open = '{{ zone.svgId }}'"
+                               @keydown.enter.prevent="open = '{{ zone.svgId }}'"
+                               @keydown.space.prevent="open = '{{ zone.svgId }}'">
+                                <rect id="zone-{{ zone.svgId }}"
+                                      x="{{ room.x }}" y="{{ room.y }}" width="{{ room.width }}" height="{{ room.height }}"
+                                      rx="10" stroke-width="2"
+                                      class="{{ roomFill[zone.kind.value] }} transition-colors hover:fill-signal-500/15 hover:stroke-signal-500"/>
 
-                {# The kit count sits outside the button on purpose: it is not
-                   part of the control's label, and folding it in would leave
-                   the accessible name disagreeing with the visible one. The
-                   equipment list beside the plan is where it is read out
-                   properly. pointer-events-none drops clicks through to the
-                   room underneath, so the number is still a live target. #}
-                <text x="{{ room.centreX }}" y="{{ room.centreY + 16 }}" text-anchor="middle" dominant-baseline="middle"
-                      aria-hidden="true"
-                      class="pointer-events-none fill-iron-400 text-[15px]">&times;{{ zone.equipment|reduce((total, item) => total + item.quantity, 0) }}</text>
+                                <text x="{{ room.centreX }}" y="{{ room.centreY - 10 }}" text-anchor="middle" dominant-baseline="middle"
+                                      class="pointer-events-none fill-white text-[18px] font-bold">{{ zone.name.get(locale) }}</text>
+                            </g>
+
+                            {# Outside the button on purpose: it is not part of the
+                               control's label, and folding it in would leave the
+                               accessible name disagreeing with the visible one.
+                               pointer-events-none drops clicks through to the room. #}
+                            <text x="{{ room.centreX }}" y="{{ room.centreY + 16 }}" text-anchor="middle" dominant-baseline="middle"
+                                  aria-hidden="true"
+                                  class="pointer-events-none fill-iron-400 text-[14px]">&times;{{ zone.unitCount }}</text>
+                        {% endfor %}
+
+                        {% if storey.number == (floors|first).number %}
+                            {# The way in. Not a room, so not something to open. #}
+                            <g aria-hidden="true">
+                                <rect x="368" y="{{ 24 + 456 }}" width="144" height="26" rx="6" class="fill-signal-500/20 stroke-signal-500" stroke-width="2"/>
+                                <text x="440" y="{{ 24 + 456 + 13 }}" text-anchor="middle" dominant-baseline="middle"
+                                      class="fill-signal-500 text-[13px] font-semibold">{{ 'branch.plan.entrance'|trans }}</text>
+                            </g>
+                        {% endif %}
+                    </svg>
+                </div>
             {% endfor %}
-        </svg>
-    </figure>
+        </div>
 
-    <div>
-        <h3 class="text-lg font-bold text-white">{{ 'branch.show.equipment'|trans }}</h3>
+        <div>
+            <h3 class="text-lg font-bold text-white">{{ 'branch.plan.rooms'|trans }}</h3>
+            <p class="mt-1 text-sm text-iron-400">{{ 'branch.show.plan_lead'|trans }}</p>
 
-        {% for zone in zones %}
-            <div x-show="active === '{{ zone.svgId }}'" x-cloak class="mt-4">
-                <p class="text-sm font-semibold uppercase tracking-wide text-signal-500">{{ zone.name.get(locale) }}</p>
+            {% for storey in floors %}
+                <ul x-show="floor === {{ storey.number }}" class="mt-4 space-y-2">
+                    {% for zone in storey.zones %}
+                        <li>
+                            <button type="button" @click="open = '{{ zone.svgId }}'"
+                                    class="flex w-full items-center justify-between gap-3 rounded-lg border border-iron-800 bg-iron-800/40 px-4 py-3 text-left transition hover:border-signal-600">
+                                <span class="text-sm font-medium text-iron-100">{{ zone.name.get(locale) }}</span>
+                                <span class="shrink-0 font-mono text-xs text-iron-400">&times;{{ zone.unitCount }}</span>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </div>
+    </div>
 
-                {% if zone.description and not zone.description.isEmpty %}
-                    <p class="mt-2 text-sm text-iron-200">{{ zone.description.get(locale) }}</p>
-                {% endif %}
+    {# ------------------------------------------------------------------ detail #}
+    {% for zone in zones %}
+        {% set layout = layouts[zone.svgId] %}
 
-                <ul class="mt-3 divide-y divide-iron-800 rounded-lg border border-iron-800">
+        <div x-show="open === '{{ zone.svgId }}'" x-cloak class="mt-5">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-xl font-bold text-white">{{ zone.name.get(locale) }}</h3>
+                    {% if zone.description and not zone.description.isEmpty %}
+                        <p class="mt-1 text-sm text-iron-200">{{ zone.description.get(locale) }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="button" @click="open = null"
+                        class="rounded-lg border border-iron-600 px-4 py-2 text-sm font-semibold text-iron-200 transition hover:border-signal-500 hover:text-white">
+                    &larr; {{ 'branch.plan.back'|trans }}
+                </button>
+            </div>
+
+            {% if layout.isEmpty %}
+                <p class="mt-4 text-iron-400">{{ 'branch.plan.empty_room'|trans }}</p>
+            {% else %}
+                <svg viewBox="{{ constant('VIEW_BOX', layout) }}" role="img"
+                     aria-label="{{ 'branch.plan.detail_of'|trans({'%zone%': zone.name.get(locale)}) }}"
+                     class="mt-4 w-full rounded-xl border border-iron-800 bg-iron-900">
+                    <defs>
+                        {# Gives the room a sense of scale, the way a surveyed
+                           plan has gridlines behind the furniture. #}
+                        <pattern id="floor-{{ zone.svgId }}" width="32" height="32" patternUnits="userSpaceOnUse">
+                            <path d="M 32 0 L 0 0 0 32" fill="none" class="stroke-iron-800" stroke-width="1"/>
+                        </pattern>
+                    </defs>
+
+                    <rect x="4" y="4" width="872" height="512" rx="14"
+                          fill="url(#floor-{{ zone.svgId }})" class="stroke-iron-800" stroke-width="2"/>
+
+                    {% for group in layout.groups %}
+                        <g data-group="{{ group.key }}">
+                            <text x="{{ group.labelX }}" y="{{ group.labelY }}" dominant-baseline="middle"
+                                  class="fill-iron-400 text-[13px] font-semibold">{{ group.label }}</text>
+
+                            {% for unit in group.units %}
+                                <rect x="{{ unit.x }}" y="{{ unit.y }}" width="{{ unit.width }}" height="{{ unit.height }}"
+                                      rx="3" stroke-width="1"
+                                      class="{{ machineFill[group.type.value] }} stroke-iron-900"/>
+                            {% endfor %}
+                        </g>
+                    {% endfor %}
+                </svg>
+
+                <ul class="mt-4 grid gap-2 sm:grid-cols-2">
                     {% for item in zone.equipment %}
-                        <li class="flex items-center justify-between gap-3 px-4 py-3">
+                        <li class="flex items-center justify-between gap-3 rounded-lg border border-iron-800 bg-iron-800/40 px-4 py-3">
                             <span class="text-sm text-iron-100">{{ item.name.get(locale) }}</span>
                             <span class="flex shrink-0 items-center gap-2">
                                 <span class="rounded bg-iron-800 px-2 py-0.5 text-xs text-iron-400">{{ ('equipment.type.' ~ item.type.value)|trans }}</span>
@@ -79,7 +182,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-            </div>
-        {% endfor %}
-    </div>
+            {% endif %}
+        </div>
+    {% endfor %}
 </div>

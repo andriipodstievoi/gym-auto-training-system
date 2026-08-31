@@ -11,7 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The plan is laid out rather than drawn, so a branch the back office invents
- * tomorrow still gets a usable floor plan without anyone opening a vector editor.
+ * tomorrow still gets a usable floor plan without anyone opening a vector
+ * editor. One storey at a time: the lounge and spa are upstairs.
  */
 final class FloorPlanBuilderTest extends TestCase
 {
@@ -26,32 +27,32 @@ final class FloorPlanBuilderTest extends TestCase
     {
         $plan = $this->builder->build(['free-weights', 'machines', 'cardio', 'functional']);
 
-        self::assertCount(4, $plan->trainingRooms);
+        self::assertCount(4, $plan->rooms);
         self::assertSame(
             ['free-weights', 'machines', 'cardio', 'functional'],
-            array_map(static fn (FloorPlanRoom $room): string => $room->svgId, $plan->trainingRooms),
+            array_map(static fn (FloorPlanRoom $room): string => $room->svgId, $plan->rooms),
         );
     }
 
-    public function testABranchWithNoZonesStillGetsABuilding(): void
+    public function testAStoreyWithNoZonesIsEmpty(): void
     {
         $plan = $this->builder->build([]);
 
-        self::assertSame([], $plan->trainingRooms);
-        self::assertNotEmpty($plan->serviceRooms);
+        self::assertTrue($plan->isEmpty());
+        self::assertSame([], $plan->rooms);
     }
 
     public function testRoomsAreLookedUpBySvgId(): void
     {
-        $plan = $this->builder->build(['cardio', 'studio']);
+        $plan = $this->builder->build(['lounge', 'spa']);
 
-        self::assertSame('studio', $plan->roomFor('studio')?->svgId);
+        self::assertSame('spa', $plan->roomFor('spa')?->svgId);
         self::assertNull($plan->roomFor('free-weights'));
     }
 
-    public function testASingleZoneTakesTheWholeTrainingArea(): void
+    public function testASingleZoneTakesTheWholeStorey(): void
     {
-        $room = $this->builder->build(['cardio'])->trainingRooms[0];
+        $room = $this->builder->build(['cardio'])->rooms[0];
 
         self::assertSame(FloorPlanBuilder::AREA_LEFT, $room->x);
         self::assertSame(FloorPlanBuilder::AREA_TOP, $room->y);
@@ -59,36 +60,56 @@ final class FloorPlanBuilderTest extends TestCase
         self::assertSame(FloorPlanBuilder::AREA_HEIGHT, $room->height);
     }
 
-    public function testAnOddCountEndsWithAFullWidthRoom(): void
+    /**
+     * The upstairs case: a lounge and a spa side by side, filling the storey.
+     */
+    public function testTwoZonesSitSideBySide(): void
     {
-        $rooms = $this->builder->build(['free-weights', 'machines', 'cardio'])->trainingRooms;
+        $rooms = $this->builder->build(['lounge', 'spa'])->rooms;
 
-        // Two side by side, then one spanning the floor.
+        self::assertSame($rooms[0]->y, $rooms[1]->y);
+        self::assertSame(FloorPlanBuilder::AREA_HEIGHT, $rooms[0]->height);
+        self::assertGreaterThan($rooms[0]->x, $rooms[1]->x);
+    }
+
+    public function testALoneRoomOnTheLastRowSpansTheFloor(): void
+    {
+        $rooms = $this->builder->build(['free-weights', 'machines', 'cardio'])->rooms;
+
         self::assertSame($rooms[0]->y, $rooms[1]->y);
         self::assertLessThan(FloorPlanBuilder::AREA_WIDTH, $rooms[0]->width);
         self::assertSame(FloorPlanBuilder::AREA_WIDTH, $rooms[2]->width);
         self::assertGreaterThan($rooms[0]->y, $rooms[2]->y);
     }
 
-    public function testAnEvenCountFillsAGrid(): void
+    /**
+     * A full ground floor - four training zones plus two changing rooms and a
+     * reception - moves to three columns so the rooms stay legible.
+     */
+    public function testABusyStoreyUsesThreeColumns(): void
     {
-        $rooms = $this->builder->build(['a', 'b', 'c', 'd'])->trainingRooms;
+        $rooms = $this->builder->build([
+            'free-weights', 'machines', 'cardio', 'functional',
+            'changing-men', 'changing-women', 'reception',
+        ])->rooms;
 
         self::assertSame($rooms[0]->y, $rooms[1]->y);
-        self::assertSame($rooms[2]->y, $rooms[3]->y);
-        self::assertSame($rooms[0]->x, $rooms[2]->x);
-        self::assertSame($rooms[1]->x, $rooms[3]->x);
+        self::assertSame($rooms[1]->y, $rooms[2]->y);
+        self::assertGreaterThan($rooms[0]->y, $rooms[3]->y);
+
+        // Seven rooms over three columns leaves one alone on the last row.
+        self::assertSame(FloorPlanBuilder::AREA_WIDTH, $rooms[6]->width);
     }
 
     /**
-     * The layout is only useful if it never spills out of the drawing or over
-     * itself, whatever number of zones a branch happens to have.
+     * The layout is only useful if it never spills out of the building or over
+     * itself, whatever number of zones a storey happens to have.
      */
     public function testRoomsStayInsideTheBuildingAndNeverOverlap(): void
     {
-        for ($count = 1; $count <= 8; ++$count) {
+        for ($count = 1; $count <= 12; ++$count) {
             $ids = array_map(static fn (int $i): string => 'zone-'.$i, range(1, $count));
-            $rooms = $this->builder->build($ids)->trainingRooms;
+            $rooms = $this->builder->build($ids)->rooms;
 
             foreach ($rooms as $room) {
                 self::assertGreaterThanOrEqual(FloorPlanBuilder::AREA_LEFT, $room->x, "count $count");
@@ -112,15 +133,6 @@ final class FloorPlanBuilderTest extends TestCase
                     self::assertFalse($this->overlaps($room, $other), "count $count: rooms overlap");
                 }
             }
-        }
-    }
-
-    public function testServiceRoomsSitBesideTheTrainingFloor(): void
-    {
-        $plan = $this->builder->build(['cardio']);
-
-        foreach ($plan->serviceRooms as $room) {
-            self::assertLessThanOrEqual(FloorPlanBuilder::AREA_LEFT, $room->x + $room->width);
         }
     }
 

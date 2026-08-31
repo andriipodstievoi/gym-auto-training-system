@@ -91,19 +91,67 @@ final class BranchControllerTest extends WebTestCase
 
     /**
      * The point of the milestone: every zone in the database becomes a shape in
-     * the drawing, addressed by its own svgId.
+     * the drawing, addressed by its own svgId - amenity rooms included, so all
+     * of them are clickable.
      */
-    public function testTheFloorPlanCarriesOneShapePerZone(): void
+    public function testEveryRoomIsAShapeAndEveryShapeIsClickable(): void
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/en/branches/centrs');
 
-        foreach (['free-weights', 'machines', 'cardio', 'functional'] as $svgId) {
+        $rooms = [
+            'free-weights', 'machines', 'cardio', 'functional',
+            'changing-men', 'changing-women', 'reception',
+            'lounge', 'spa',
+        ];
+
+        foreach ($rooms as $svgId) {
             self::assertCount(1, $crawler->filter('rect#zone-'.$svgId), $svgId.' has no shape');
         }
 
-        // Every shape is wired to the same Alpine state the equipment lists read.
-        self::assertCount(4, $crawler->filter('svg g[role="button"]'));
+        self::assertCount(count($rooms), $crawler->filter('svg g[role="button"]'));
+    }
+
+    public function testChangingRoomsAreSplitBySex(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/en/branches/centrs');
+
+        self::assertCount(1, $crawler->filter('rect#zone-changing-men'));
+        self::assertCount(1, $crawler->filter('rect#zone-changing-women'));
+        self::assertCount(0, $crawler->filter('rect#zone-changing-rooms'));
+    }
+
+    /**
+     * The lounge and spa belong upstairs, which is the whole reason the plan
+     * is drawn one storey at a time.
+     */
+    public function testTheLoungeAndSpaAreOnTheirOwnStorey(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/en/branches/centrs');
+
+        self::assertCount(2, $crawler->filter('[role="tablist"] button'));
+        self::assertSelectorTextContains('[role="tablist"]', 'Ground floor');
+        self::assertSelectorTextContains('[role="tablist"]', 'Upper floor');
+
+        // The upper storey draws exactly the two rooms that live on it.
+        $upstairs = $crawler->filter('[x-show="floor === 1"]')->first();
+        self::assertStringContainsString('Lounge', $upstairs->text());
+        self::assertStringContainsString('Spa', $upstairs->text());
+        self::assertStringNotContainsString('Free weights', $upstairs->text());
+    }
+
+    public function testEveryBranchHasALoungeAndASpa(): void
+    {
+        $client = static::createClient();
+
+        foreach (['centrs', 'purvciems', 'agenskalns'] as $slug) {
+            $crawler = $client->request('GET', '/en/branches/'.$slug);
+
+            self::assertCount(1, $crawler->filter('rect#zone-lounge'), $slug.' has no lounge');
+            self::assertCount(1, $crawler->filter('rect#zone-spa'), $slug.' has no spa');
+        }
     }
 
     public function testAZoneRevealsItsOwnEquipment(): void
@@ -111,12 +159,41 @@ final class BranchControllerTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/en/branches/centrs');
 
-        $panel = $crawler->filter('[x-show="active === \'cardio\'"]');
+        $panel = $crawler->filter('[x-show="open === \'cardio\'"]');
 
         self::assertCount(1, $panel);
         self::assertStringContainsString('Treadmill', $panel->text());
         self::assertStringContainsString('Rowing machine', $panel->text());
         self::assertStringNotContainsString('Power rack', $panel->text());
+    }
+
+    /**
+     * The detailed view draws one footprint per machine, not one per line, so
+     * ten treadmills and four rowers are fourteen shapes.
+     */
+    public function testTheDetailedPlanDrawsEveryIndividualMachine(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/en/branches/centrs');
+
+        $cardio = $crawler->filter('[x-show="open === \'cardio\'"]')->first();
+
+        // One outer building rect, then one per machine.
+        self::assertCount(15, $cardio->filter('svg rect'));
+    }
+
+    public function testAmenityRoomsGetTheirOwnDetailedPlan(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/en/branches/centrs');
+
+        $spa = $crawler->filter('[x-show="open === \'spa\'"]')->first();
+
+        self::assertStringContainsString('Finnish sauna', $spa->text());
+        self::assertStringContainsString('Plunge pool', $spa->text());
+
+        // Sauna, steam room, plunge pool and six loungers.
+        self::assertCount(9, $spa->filter('svg g[data-group] rect'));
     }
 
     public function testEquipmentIsTranslated(): void
@@ -126,7 +203,12 @@ final class BranchControllerTest extends WebTestCase
 
         self::assertStringContainsString(
             'Skrejceliņš',
-            $crawler->filter('[x-show="active === \'cardio\'"]')->text(),
+            $crawler->filter('[x-show="open === \'cardio\'"]')->text(),
+        );
+
+        self::assertStringContainsString(
+            'Vīriešu ģērbtuve',
+            $crawler->filter('[x-show="open === \'changing-men\'"]')->text(),
         );
     }
 
@@ -135,7 +217,8 @@ final class BranchControllerTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/en/branches/purvciems');
 
-        self::assertCount(3, $crawler->filter('svg g[role="button"]'));
+        // Three training zones plus the shared amenity rooms.
+        self::assertCount(8, $crawler->filter('svg g[role="button"]'));
         self::assertCount(0, $crawler->filter('rect#zone-functional'));
         self::assertCount(1, $crawler->filter('rect#zone-machines'));
     }

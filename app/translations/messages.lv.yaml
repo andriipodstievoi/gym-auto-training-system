@@ -75,15 +75,22 @@ branch:
         closed: "Slēgts"
         contact: "Kontakti"
         plan_title: "Zāles plāns"
-        plan_lead: "Izvēlies zonu, lai redzētu, kas tajā ir."
+        plan_lead: "Izvēlies telpu, lai redzētu katru tās vienību."
         plan_empty: "Šīs filiāles zāles plāns vēl nav publicēts."
         equipment: "Šajā zonā"
         trainers: "Šīs filiāles treneri"
         trainers_empty: "Šai filiālei vēl nav piesaistīts neviens treneris."
     plan:
         entrance: "Ieeja"
-        reception: "Reģistratūra"
-        changing-rooms: "Ģērbtuves"
+        storeys: "Stāvi"
+        floor:
+            '0': "Pirmais stāvs"
+            '1': "Otrais stāvs"
+        floor_n: "%number%. stāvs"
+        rooms: "Telpas šajā stāvā"
+        back: "Atpakaļ uz zāles plānu"
+        detail_of: "Detalizēts %zone% plāns"
+        empty_room: "Šajā telpā vēl nekas nav norādīts."
 
 equipment:
     type:
@@ -95,6 +102,7 @@ equipment:
         band: "Gumijas"
         bodyweight: "Sava svara"
         cardio: "Kardio"
+        fixture: "Aprīkojums"
 
 membership:
     index:
