@@ -62,7 +62,7 @@ loads. The site produces valid programmes with no API key configured.
 | **M2** | Public site, Leaflet branch map, SVG floor plan | ✅ done |
 | **M3** | Accounts, memberships, Stripe test checkout | ✅ done |
 | **M4** | Shop — catalogue, cart, orders | ✅ done |
-| M5 | Trainers, availability, booking, messaging | planned |
+| **M5** | Trainers, availability, booking, messaging | ✅ done |
 | M6 | Assessment, rule engine, LLM layer, PDF export | planned |
 | M7 | Coverage, docs, screenshots | planned |
 
@@ -138,6 +138,7 @@ The fixtures seed three accounts, all with the password `speks-dev`:
 | `admin@speks.lv` | `ROLE_ADMIN` | back office |
 | `member@speks.lv` | `ROLE_USER` | holds an active membership |
 | `prospect@speks.lv` | `ROLE_USER` | no membership yet |
+| `coach@speks.lv` | `ROLE_USER` | linked to a trainer, so `/coach` opens |
 
 They exist only in a local or CI database. Anywhere else, create the first
 administrator yourself.

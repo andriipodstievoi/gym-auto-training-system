@@ -1,0 +1,35 @@
+{% extends 'email/_layout.html.twig' %}
+
+{% set when = booking.startsAt|format_datetime('full', 'short', locale=locale, timezone=gym_timezone()) %}
+
+{% block subject %}{{ 'email.booking_requested_member.subject'|trans({}, 'messages', locale) }}{% endblock %}
+
+{% block content %}
+    <p style="margin:0 0 16px;font-size:20px;font-weight:bold;color:#ffffff;">
+        {{ 'email.booking_requested_member.heading'|trans({'%coach%': booking.trainer.fullName}, 'messages', locale) }}
+    </p>
+
+    <p style="margin:0 0 20px;">
+        {{ 'email.booking_requested_member.body'|trans({}, 'messages', locale) }}
+    </p>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;font-size:14px;">
+        <tr>
+            <td style="padding:6px 0;color:#a1a1aa;">{{ 'booking.form.when'|trans({}, 'messages', locale) }}</td>
+            <td style="padding:6px 0;text-align:right;color:#ffffff;">{{ when }}</td>
+        </tr>
+        <tr>
+            <td style="padding:6px 0;color:#a1a1aa;">{{ 'booking.form.price'|trans({}, 'messages', locale) }}</td>
+            <td style="padding:6px 0;text-align:right;color:#ffffff;font-weight:bold;">
+                {{ (booking.pricePaidCents / 100)|format_currency('EUR', locale=locale) }}
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin:24px 0 0;">
+        <a href="{{ url('app_account_bookings', {'_locale': locale}) }}"
+           style="display:inline-block;background:#84cc16;color:#18181b;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">
+            {{ 'email.booking_requested_member.cta'|trans({}, 'messages', locale) }}
+        </a>
+    </p>
+{% endblock %}

@@ -172,6 +172,21 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 - **Disabling an EasyAdmin action is not the same as removing it.** `remove()` only hides the
   button and leaves `/admin/<entity>/new` working; `disable()` makes it 403. Orders use `disable()`
   so no one can hand-write a paid order.
+- **Symfony's `TimeType` stays a compound widget** even with `with_minutes: false`: its label
+  points at the wrapping div, so the `<select>` inside it has no label and Lighthouse fails
+  `select-name`. A `ChoiceType` plus a model transformer gives one control with one real label.
+  See `App\Form\DataTransformer\HourToTimeTransformer`.
+- A **generic `@implements DataTransformerInterface<A, B>` narrows `mixed`**, so defensive
+  `instanceof`/`is_string` checks inside the transformer are dead code and PHPStan says so. Trust
+  the generic and delete them rather than reaching for an ignore.
+- **A unique index keyed on the wrong column quietly takes something off sale forever.** Keying
+  bookings on `(trainer_id, starts_at)` means a declined hour keeps its row, so the index keeps
+  refusing it while the slot picker keeps offering it. Key on a nullable `held_slot_at` that goes
+  null when the booking lets go - MySQL allows any number of nulls in a unique index.
+- **Two mails about the same event are not the same mail.** The coach's "new session request" and
+  the member's "we passed it on" shared a subject line at first, which made a member's inbox read
+  as though somebody wanted an hour from *them*.
+
 
 ## Status
 
@@ -182,8 +197,8 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 | M2 | Public site, Leaflet branch map, SVG floor plan | done |
 | M3 | Accounts, memberships, Stripe test checkout | done |
 | M4 | Shop — catalogue, cart, orders | done |
-| M5 | Trainers, availability, booking, messaging | **next** |
-| M6 | Assessment, rule engine, LLM layer, PDF export | planned |
+| M5 | Trainers, availability, booking, messaging | done |
+| M6 | Assessment, rule engine, LLM layer, PDF export | **next** |
 | M7 | Coverage, docs, screenshots | planned |
 
 ### Decisions already made
@@ -226,6 +241,27 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   a live-key run is Andrii's alone.
 - Fixtures seed `admin@speks.lv`, `member@speks.lv` and `prospect@speks.lv`, all with
   password `speks-dev`.
+
+### Trainers and booking (M5)
+
+- **The coach owns the diary.** A booking starts REQUESTED because a member asking for an hour is
+  not a coach agreeing to work it. Only the coach may confirm or decline; either side may cancel
+  something that has not happened yet.
+- **Times are stored UTC and shown in `Europe/Riga`.** `SlotFinder` expands availability windows in
+  Riga wall clock - a coach saying "09:00" means 09:00 in Riga - then converts each slot to UTC.
+  `trainer_availability.start_time`/`end_time` are naive local times by design, which is what keeps
+  them right across both clock changes a year. `SlotFinder::TIMEZONE` is the single source of that
+  string and reaches Twig as `gym_timezone()`.
+- **`SlotFinder` takes a `ClockInterface`.** Slot generation that reads the wall clock directly is
+  untestable; with `MockClock` the lead time, the past-slot cut-off and the booked-slot exclusion
+  are all assertable.
+- **The price is snapshotted onto the booking**, pro-rated from the coach's hourly rate. Same
+  promise `UserMembership` and `OrderItem` make.
+- **There is no coach firewall and no `ROLE_TRAINER`.** A coach is a `User` some `Trainer` row
+  points at. Ownership - "is this booking yours" - cannot be written as a path pattern, so it lives
+  in `CoachController` next to the code it guards rather than in `security.yaml`.
+- Mail goes out in the **recipient's** profile locale, not the request locale: a booking can send a
+  Latvian mail to the member and a Russian one to the coach from the same click.
 
 ### The shop (M4)
 

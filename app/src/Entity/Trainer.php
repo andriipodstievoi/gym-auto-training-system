@@ -8,6 +8,8 @@ use App\Doctrine\Type\TranslatedStringType;
 use App\Domain\Enum\TrainerSpeciality;
 use App\Domain\TranslatedString;
 use App\Repository\TrainerRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -79,9 +81,27 @@ class Trainer
     #[ORM\Column]
     private bool $active = true;
 
+    /**
+     * The weekly hours this coach works, which booking expands into slots.
+     *
+     * @var Collection<int, TrainerAvailability>
+     */
+    #[ORM\OneToMany(targetEntity: TrainerAvailability::class, mappedBy: 'trainer', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['weekday' => 'ASC', 'startTime' => 'ASC'])]
+    private Collection $availability;
+
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'trainer')]
+    #[ORM\OrderBy(['startsAt' => 'ASC'])]
+    private Collection $bookings;
+
     public function __construct()
     {
         $this->bio = new TranslatedString();
+        $this->availability = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -233,6 +253,62 @@ class Trainer
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TrainerAvailability>
+     */
+    public function getAvailability(): Collection
+    {
+        return $this->availability;
+    }
+
+    public function addAvailability(TrainerAvailability $availability): static
+    {
+        if (!$this->availability->contains($availability)) {
+            $this->availability->add($availability);
+        }
+
+        return $this;
+    }
+
+    public function removeAvailability(TrainerAvailability $availability): static
+    {
+        $this->availability->removeElement($availability);
+
+        return $this;
+    }
+
+    /**
+     * Whether anybody could book this coach at all. A coach with no hours set
+     * says so plainly rather than showing an empty slot picker.
+     */
+    public function hasActiveAvailability(): bool
+    {
+        foreach ($this->availability as $window) {
+            if ($window->isActive()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+        }
 
         return $this;
     }

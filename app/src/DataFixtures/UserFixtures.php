@@ -14,8 +14,11 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Three accounts covering the states the site has to handle: staff, a member
- * who holds an active membership, and a member who holds nothing yet.
+ * Four accounts covering the states the site has to handle: staff, a member who
+ * holds an active membership, a member who holds nothing yet, and a coach.
+ *
+ * The coach account carries no special role - BookingFixtures points a trainer
+ * row at it, and being a coach is exactly that and nothing else.
  *
  * The shared development password is fine here and nowhere else - these rows
  * only ever exist in a local or CI database.
@@ -25,6 +28,7 @@ final class UserFixtures extends Fixture implements DependentFixtureInterface
     public const string REFERENCE_ADMIN = 'user-admin';
     public const string REFERENCE_MEMBER = 'user-member';
     public const string REFERENCE_PROSPECT = 'user-prospect';
+    public const string REFERENCE_COACH = 'user-coach';
 
     private const string DEV_PASSWORD = 'speks-dev';
 
@@ -50,6 +54,14 @@ final class UserFixtures extends Fixture implements DependentFixtureInterface
                 'lastName' => 'Ozols',
                 'roles' => [],
                 'locale' => 'lv',
+            ],
+            [
+                'reference' => self::REFERENCE_COACH,
+                'email' => 'coach@speks.lv',
+                'firstName' => 'Artjoms',
+                'lastName' => 'Kuzņecovs',
+                'roles' => [],
+                'locale' => 'ru',
             ],
             [
                 'reference' => self::REFERENCE_PROSPECT,

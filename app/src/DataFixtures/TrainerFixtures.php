@@ -20,10 +20,20 @@ use Doctrine\Persistence\ObjectManager;
  */
 final class TrainerFixtures extends Fixture implements DependentFixtureInterface
 {
+    /**
+     * Referenced by BookingFixtures, which gives these coaches their weekly
+     * hours and a diary.
+     */
+    public const string REFERENCE_ILZE = 'trainer-ilze-berzina';
+    public const string REFERENCE_ARTJOMS = 'trainer-artjoms-kuznecovs';
+    public const string REFERENCE_MARTA = 'trainer-marta-ozola';
+    public const string REFERENCE_DENISS = 'trainer-deniss-petrovs';
+
     public function load(ObjectManager $manager): void
     {
         $trainers = [
             [
+                'reference' => self::REFERENCE_ILZE,
                 'slug' => 'ilze-berzina',
                 'fullName' => 'Ilze Bērziņa',
                 'branch' => BranchFixtures::REFERENCE_CENTRS,
@@ -37,6 +47,7 @@ final class TrainerFixtures extends Fixture implements DependentFixtureInterface
                 ),
             ],
             [
+                'reference' => self::REFERENCE_ARTJOMS,
                 'slug' => 'artjoms-kuznecovs',
                 'fullName' => 'Artjoms Kuzņecovs',
                 'branch' => BranchFixtures::REFERENCE_CENTRS,
@@ -50,6 +61,7 @@ final class TrainerFixtures extends Fixture implements DependentFixtureInterface
                 ),
             ],
             [
+                'reference' => self::REFERENCE_MARTA,
                 'slug' => 'marta-ozola',
                 'fullName' => 'Marta Ozola',
                 'branch' => BranchFixtures::REFERENCE_AGENSKALNS,
@@ -63,6 +75,7 @@ final class TrainerFixtures extends Fixture implements DependentFixtureInterface
                 ),
             ],
             [
+                'reference' => self::REFERENCE_DENISS,
                 'slug' => 'deniss-petrovs',
                 'fullName' => 'Deniss Petrovs',
                 'branch' => BranchFixtures::REFERENCE_PURVCIEMS,
@@ -81,19 +94,20 @@ final class TrainerFixtures extends Fixture implements DependentFixtureInterface
             /** @var Branch $branch */
             $branch = $this->getReference($data['branch'], Branch::class);
 
-            $manager->persist(
-                (new Trainer())
-                    ->setSlug($data['slug'])
-                    ->setFullName($data['fullName'])
-                    ->setBio($data['bio'])
-                    ->setBranch($branch)
-                    ->setLanguages($data['languages'])
-                    ->setHourlyRateCents($data['hourlyRateCents'])
-                    ->setSpecialities(array_map(
-                        static fn (TrainerSpeciality $speciality): string => $speciality->value,
-                        $data['specialities'],
-                    ))
-            );
+            $trainer = (new Trainer())
+                ->setSlug($data['slug'])
+                ->setFullName($data['fullName'])
+                ->setBio($data['bio'])
+                ->setBranch($branch)
+                ->setLanguages($data['languages'])
+                ->setHourlyRateCents($data['hourlyRateCents'])
+                ->setSpecialities(array_map(
+                    static fn (TrainerSpeciality $speciality): string => $speciality->value,
+                    $data['specialities'],
+                ));
+
+            $manager->persist($trainer);
+            $this->addReference($data['reference'], $trainer);
         }
 
         $manager->flush();

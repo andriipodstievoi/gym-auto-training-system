@@ -16,3 +16,8 @@ framework:
             # "checkout" on purpose: mutating a cart is not handing money to
             # Stripe, and the two should not share a token.
             - cart
+            # Asking a coach for an hour, and writing to one. Both are
+            # hand-written forms rather than form types, so they carry their
+            # own ids like the two above.
+            - booking
+            - message

@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% set tz = gym_timezone() %}
+
+{% block title %}{{ 'account.bookings.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'account.bookings.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-4xl px-4 py-14">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-signal-500">{{ 'account.kicker'|trans }}</p>
+        <h1 class="mt-3 text-4xl font-black text-white">{{ 'account.bookings.title'|trans }}</h1>
+
+        {% include 'account/_nav.html.twig' %}
+
+        <div class="mt-8">
+            {% include 'partials/_flashes.html.twig' %}
+        </div>
+
+        <p class="text-iron-200">{{ 'account.bookings.lead'|trans }}</p>
+
+        {% if bookings|length > 0 %}
+            <div class="mt-6 overflow-x-auto rounded-xl border border-iron-800">
+                <table class="w-full min-w-[40rem] text-left text-sm">
+                    <caption class="sr-only">{{ 'account.bookings.title'|trans }}</caption>
+                    <thead class="bg-iron-800/60 text-xs uppercase tracking-wide text-iron-400">
+                        <tr>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'account.bookings.when'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'account.bookings.coach'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'account.bookings.status'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'booking.form.price'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">
+                                <span class="sr-only">{{ 'account.bookings.cancel'|trans }}</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-iron-800 text-iron-200">
+                        {% for booking in bookings %}
+                            <tr>
+                                <td class="px-5 py-3">
+                                    {{ booking.startsAt|format_datetime('medium', 'short', timezone=tz) }}
+                                    <span class="ml-2 text-xs uppercase tracking-wide text-iron-400">
+                                        {{ booking.startsAt > now ? 'account.bookings.upcoming'|trans : 'account.bookings.past'|trans }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3">
+                                    <a class="font-medium text-white hover:text-signal-500"
+                                       href="{{ path('trainer_show', {slug: booking.trainer.slug}) }}">{{ booking.trainer.fullName }}</a>
+                                </td>
+                                <td class="px-5 py-3">{{ booking.status.translationKey|trans }}</td>
+                                <td class="px-5 py-3 font-semibold text-white">
+                                    {{ (booking.pricePaidCents / 100)|format_currency('EUR') }}
+                                </td>
+                                <td class="px-5 py-3 text-right">
+                                    {% if booking.isCancellableBy(app.user, now) %}
+                                        <form method="post" action="{{ path('booking_cancel', {id: booking.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('booking') }}">
+                                            <button type="submit" class="rounded-lg border border-iron-700 px-3 py-1.5 font-medium text-iron-100 hover:border-signal-500 hover:text-signal-500">
+                                                {{ 'account.bookings.cancel'|trans }}
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="mt-6 rounded-xl border border-iron-800 bg-iron-800/40 p-7">
+                <p class="text-iron-200">{{ 'account.bookings.empty'|trans }}</p>
+                <a href="{{ path('trainer_index') }}"
+                   class="mt-5 inline-block rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
+                    {{ 'trainer.profile'|trans }}
+                </a>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

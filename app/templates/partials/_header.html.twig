@@ -45,6 +45,25 @@
             </a>
 
             {% if app.user %}
+                {#
+                   The count sits outside the link's text for the same reason
+                   the cart badge does: axe compares an element's visible text
+                   against its accessible name, and a number appended to one
+                   but not the other fails that check.
+                #}
+                {% set unread = unread_messages() %}
+                <a href="{{ path('message_index') }}"
+                   class="{{ current starts with 'message_' ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
+                   aria-label="{{ 'nav.messages'|trans }}{% if unread > 0 %} ({{ unread }}){% endif %}">
+                    <span aria-hidden="true">{{ 'nav.messages'|trans }}{% if unread > 0 %} <span class="ml-1 rounded-full bg-signal-500 px-2 py-0.5 text-xs font-bold text-iron-900">{{ unread }}</span>{% endif %}</span>
+                </a>
+
+                {% if is_coach() %}
+                    <a href="{{ path('coach_dashboard') }}"
+                       class="{{ current starts with 'coach_' ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
+                       {{ current starts with 'coach_' ? 'aria-current="page"' : '' }}>{{ 'coach.nav.label'|trans }}</a>
+                {% endif %}
+
                 {% set on_account = current starts with 'app_account' %}
                 <a href="{{ path('app_account') }}"
                    class="{{ on_account ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
@@ -79,6 +98,13 @@
             </a>
 
             {% if app.user %}
+                <a href="{{ path('message_index') }}" class="text-iron-100 hover:text-signal-500"
+                   aria-label="{{ 'nav.messages'|trans }}{% if unread_messages() > 0 %} ({{ unread_messages() }}){% endif %}">
+                    <span aria-hidden="true">{{ 'nav.messages'|trans }}{% if unread_messages() > 0 %} ({{ unread_messages() }}){% endif %}</span>
+                </a>
+                {% if is_coach() %}
+                    <a href="{{ path('coach_dashboard') }}" class="text-iron-100 hover:text-signal-500">{{ 'coach.nav.label'|trans }}</a>
+                {% endif %}
                 <a href="{{ path('app_account') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.account'|trans }}</a>
                 <a href="{{ path('app_logout') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.logout'|trans }}</a>
             {% else %}

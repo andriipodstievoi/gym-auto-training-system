@@ -91,11 +91,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private Collection $orders;
 
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'user', orphanRemoval: true)]
+    #[ORM\OrderBy(['startsAt' => 'DESC'])]
+    private Collection $bookings;
+
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable();
         $this->memberships = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,6 +151,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = array_values(array_filter($roles, static fn (string $role): bool => 'ROLE_USER' !== $role));
 
         return $this;
+    }
+
+    /**
+     * Whether this is the same person as $other.
+     *
+     * Identity first, then the id: two references to one managed entity are
+     * the same object, and comparing ids alone would call two brand-new rows
+     * equal because both of their ids are still null.
+     */
+    public function is(self $other): bool
+    {
+        if ($this === $other) {
+            return true;
+        }
+
+        return null !== $this->id && $this->id === $other->getId();
     }
 
     public function isAdmin(): bool
@@ -246,6 +270,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->orders->contains($order)) {
             $this->orders->add($order);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
         }
 
         return $this;

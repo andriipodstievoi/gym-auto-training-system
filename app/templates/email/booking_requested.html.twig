@@ -1,0 +1,32 @@
+{% extends 'email/_layout.html.twig' %}
+
+{#
+   The moment is stored in UTC and read in Riga, because that is where the
+   session happens and where both people will be standing.
+#}
+{% set when = booking.startsAt|format_datetime('full', 'short', locale=locale, timezone=gym_timezone()) %}
+
+{% block subject %}{{ 'email.booking_requested.subject'|trans({}, 'messages', locale) }}{% endblock %}
+
+{% block content %}
+    <p style="margin:0 0 16px;font-size:20px;font-weight:bold;color:#ffffff;">
+        {{ 'email.booking_requested.heading'|trans({'%member%': booking.user.fullName}, 'messages', locale) }}
+    </p>
+
+    <p style="margin:0 0 20px;">
+        {{ 'email.booking_requested.body'|trans({'%when%': when}, 'messages', locale) }}
+    </p>
+
+    {% if booking.notes %}
+        <p style="margin:0 0 20px;padding:16px;background:#18181b;border-radius:8px;color:#a1a1aa;">
+            {{ booking.notes }}
+        </p>
+    {% endif %}
+
+    <p style="margin:24px 0 0;">
+        <a href="{{ url('coach_dashboard', {'_locale': locale}) }}"
+           style="display:inline-block;background:#84cc16;color:#18181b;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">
+            {{ 'email.booking_requested.cta'|trans({}, 'messages', locale) }}
+        </a>
+    </p>
+{% endblock %}

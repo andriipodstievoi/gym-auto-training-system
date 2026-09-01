@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% set tz = gym_timezone() %}
+{% set other = conversation.counterpartNameFor(app.user) %}
+
+{% block title %}{{ 'message.thread_with'|trans({'%name%': other}) }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'message.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-3xl px-4 py-14">
+        <a href="{{ path('message_index') }}" class="text-sm font-medium text-iron-400 hover:text-signal-500">
+            &larr; {{ 'message.title'|trans }}
+        </a>
+
+        <h1 class="mt-6 text-3xl font-black text-white sm:text-4xl">
+            {{ 'message.thread_with'|trans({'%name%': other}) }}
+        </h1>
+
+        <div class="mt-8">
+            {% include 'partials/_flashes.html.twig' %}
+        </div>
+
+        <ol class="space-y-4">
+            {% for message in conversation.messages %}
+                {% set mine = message.sender.id == app.user.id %}
+                <li class="rounded-xl border p-5 {{ mine ? 'border-signal-600 bg-signal-500/10' : 'border-iron-800 bg-iron-800/40' }}">
+                    <p class="text-sm font-semibold text-white">{{ message.sender.fullName }}</p>
+                    <p class="mt-1 text-xs text-iron-400">
+                        {{ message.sentAt|format_datetime('medium', 'short', timezone=tz) }}
+                    </p>
+                    <p class="mt-3 whitespace-pre-line leading-relaxed text-iron-100">{{ message.body }}</p>
+                </li>
+            {% endfor %}
+        </ol>
+
+        <form method="post" action="{{ path('message_send') }}" class="mt-8">
+            <input type="hidden" name="_token" value="{{ csrf_token('message') }}">
+            <input type="hidden" name="conversation" value="{{ conversation.id }}">
+
+            <label for="message-body" class="block text-sm font-semibold text-white">{{ 'message.body'|trans }}</label>
+            <textarea id="message-body" name="body" rows="4" required maxlength="2000"
+                      placeholder="{{ 'message.placeholder'|trans }}"
+                      class="mt-2 w-full rounded-lg border border-iron-700 bg-iron-900 px-4 py-3 text-iron-100 focus:border-signal-500 focus:outline-none"></textarea>
+
+            <button type="submit" class="mt-4 rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+                {{ 'message.send'|trans }}
+            </button>
+        </form>
+    </section>
+{% endblock %}

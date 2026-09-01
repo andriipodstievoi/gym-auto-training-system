@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Mailer;
 
+use App\Entity\Booking;
+use App\Entity\Message;
 use App\Entity\Order;
 use App\Entity\User;
 use App\Entity\UserMembership;
@@ -55,6 +57,90 @@ final readonly class MemberMailer
             'email/order_confirmed.html.twig',
             ['order' => $order],
         );
+    }
+
+    /**
+     * Tells the coach somebody wants an hour of their time.
+     *
+     * A coach with no linked account has nowhere to be written to - the public
+     * profile goes up long before the login exists - so this quietly does
+     * nothing rather than dereferencing null. The request is still recorded,
+     * and still shows on the coach area once they do have one.
+     */
+    public function sendBookingRequested(Booking $booking): void
+    {
+        $coach = $booking->getTrainer()->getUser();
+
+        if (null === $coach) {
+            return;
+        }
+
+        $this->send($coach, 'email.booking_requested.subject', 'email/booking_requested.html.twig', [
+            'booking' => $booking,
+        ]);
+    }
+
+    /**
+     * The member's own copy of the request.
+     *
+     * Deliberately not the coach's mail with a different recipient: the coach
+     * is being asked to do something, the member is being told we passed the
+     * message on. Sharing a subject line made a member's inbox read as though
+     * somebody wanted an hour from them.
+     */
+    public function sendBookingRequestReceived(Booking $booking): void
+    {
+        $this->send($booking->getUser(), 'email.booking_requested_member.subject', 'email/booking_requested_member.html.twig', [
+            'booking' => $booking,
+        ]);
+    }
+
+    public function sendBookingConfirmed(Booking $booking): void
+    {
+        $this->send($booking->getUser(), 'email.booking_confirmed.subject', 'email/booking_confirmed.html.twig', [
+            'booking' => $booking,
+        ]);
+    }
+
+    public function sendBookingDeclined(Booking $booking): void
+    {
+        $this->send($booking->getUser(), 'email.booking_declined.subject', 'email/booking_declined.html.twig', [
+            'booking' => $booking,
+        ]);
+    }
+
+    /**
+     * Goes to whoever did not call the session off, which today is always the
+     * coach - only the member has a cancel button. Same null-coach caveat.
+     */
+    public function sendBookingCancelled(Booking $booking, User $cancelledBy): void
+    {
+        $coach = $booking->getTrainer()->getUser();
+        $recipient = $booking->getUser()->getId() === $cancelledBy->getId() ? $coach : $booking->getUser();
+
+        if (null === $recipient) {
+            return;
+        }
+
+        $this->send($recipient, 'email.booking_cancelled.subject', 'email/booking_cancelled.html.twig', [
+            'booking' => $booking,
+        ]);
+    }
+
+    /**
+     * Nudges the other party in a thread. The recipient is nullable for the
+     * same reason: a member may write to a coach who has no login yet, and
+     * the message waits for them rather than failing the send.
+     */
+    public function sendNewMessage(Message $message, ?User $recipient): void
+    {
+        if (null === $recipient) {
+            return;
+        }
+
+        $this->send($recipient, 'email.message.subject', 'email/new_message.html.twig', [
+            'message' => $message,
+        ]);
     }
 
     /**

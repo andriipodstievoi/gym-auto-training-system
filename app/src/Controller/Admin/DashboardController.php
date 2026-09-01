@@ -57,6 +57,8 @@ final class DashboardController extends AbstractDashboardController
         yield MenuItem::section('People');
         yield MenuItem::linkTo(UserCrudController::class, 'Users', 'fa fa-user');
         yield MenuItem::linkTo(TrainerCrudController::class, 'Trainers', 'fa fa-user-tie');
+        yield MenuItem::linkTo(TrainerAvailabilityCrudController::class, 'Trainer availability', 'fa fa-calendar-week');
+        yield MenuItem::linkTo(BookingCrudController::class, 'Bookings', 'fa fa-calendar-check');
 
         yield MenuItem::section('Training');
         yield MenuItem::linkTo(ExerciseCrudController::class, 'Exercise library', 'fa fa-list-check');

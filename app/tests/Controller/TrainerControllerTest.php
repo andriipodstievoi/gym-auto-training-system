@@ -66,14 +66,43 @@ final class TrainerControllerTest extends WebTestCase
     }
 
     /**
-     * Booking is M5, so the profile must not offer one yet.
+     * M5 replaced the "coming soon" note with a real call to action. A visitor
+     * who is not signed in is offered the sign-in, not the booking form.
      */
-    public function testTheProfileDoesNotOfferABooking(): void
+    public function testTheProfileOffersBookingAndSendsAnonymousVisitorsToSignIn(): void
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/en/trainers/marta-ozola');
 
-        self::assertCount(0, $crawler->filter('form'));
-        self::assertSelectorTextContains('body', 'Online booking is coming soon');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextNotContains('body', 'Online booking is coming soon');
+        self::assertCount(1, $crawler->filter('a[href="/en/trainers/marta-ozola/book"]'));
+        self::assertSelectorTextContains('body', 'Sign in to book');
+
+        // Nothing to message with until there is somebody to message as.
+        self::assertCount(0, $crawler->filter('form[action="/en/messages/send"]'));
+    }
+
+    /**
+     * A coach with no hours set says so, rather than showing an empty widget.
+     */
+    public function testACoachWithNoAvailabilitySaysSo(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/en/trainers/deniss-petrovs');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'This coach has no open slots');
+    }
+
+    /**
+     * The index used to carry the same "coming soon" note. It is now false.
+     */
+    public function testTheIndexNoLongerPromisesBookingLater(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/en/trainers');
+
+        self::assertSelectorTextNotContains('body', 'Online booking is coming soon');
     }
 }

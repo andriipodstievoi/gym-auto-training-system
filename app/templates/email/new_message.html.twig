@@ -1,0 +1,28 @@
+{% extends 'email/_layout.html.twig' %}
+
+{% block subject %}{{ 'email.message.subject'|trans({}, 'messages', locale) }}{% endblock %}
+
+{% block content %}
+    <p style="margin:0 0 16px;font-size:20px;font-weight:bold;color:#ffffff;">
+        {{ 'email.message.heading'|trans({'%sender%': message.sender.fullName}, 'messages', locale) }}
+    </p>
+
+    <p style="margin:0 0 20px;">
+        {{ 'email.message.body'|trans({}, 'messages', locale) }}
+    </p>
+
+    {#
+       An excerpt rather than the whole message: enough to know whether it can
+       wait, not enough to make the mail a copy of the thread.
+    #}
+    <p style="margin:0 0 20px;padding:16px;background:#18181b;border-radius:8px;color:#a1a1aa;">
+        {{ message.body|slice(0, 240) }}
+    </p>
+
+    <p style="margin:24px 0 0;">
+        <a href="{{ url('message_thread', {'_locale': locale, 'id': message.conversation.id}) }}"
+           style="display:inline-block;background:#84cc16;color:#18181b;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">
+            {{ 'email.message.cta'|trans({}, 'messages', locale) }}
+        </a>
+    </p>
+{% endblock %}

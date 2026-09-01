@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% set tz = gym_timezone() %}
+
+{% block title %}{{ 'coach.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'coach.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-4xl px-4 py-14">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-signal-500">{{ 'coach.kicker'|trans }}</p>
+        <h1 class="mt-3 text-4xl font-black text-white">{{ 'coach.title'|trans }}</h1>
+
+        {% include 'coach/_nav.html.twig' %}
+
+        <div class="mt-8">
+            {% include 'partials/_flashes.html.twig' %}
+        </div>
+
+        <p class="text-iron-200">{{ 'coach.lead'|trans }}</p>
+
+        <h2 class="mt-8 text-lg font-bold text-white">{{ 'coach.bookings.title'|trans }}</h2>
+
+        {% if bookings|length > 0 %}
+            <ul class="mt-4 space-y-3">
+                {% for booking in bookings %}
+                    <li class="rounded-xl border border-iron-800 bg-iron-800/40 p-5">
+                        <div class="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <p class="font-semibold text-white">
+                                    {{ booking.startsAt|format_datetime('full', 'short', timezone=tz) }}
+                                </p>
+                                <p class="mt-1 text-sm text-iron-400">
+                                    {{ 'coach.member'|trans }}: {{ booking.user.fullName }}
+                                </p>
+                                <p class="mt-1 text-sm text-iron-400">
+                                    {{ booking.status.translationKey|trans }} ·
+                                    {{ (booking.pricePaidCents / 100)|format_currency('EUR') }}
+                                </p>
+                            </div>
+
+                            {% if booking.status.awaitsResponse %}
+                                <div class="flex gap-2">
+                                    <form method="post" action="{{ path('coach_booking_respond', {id: booking.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('booking') }}">
+                                        <input type="hidden" name="decision" value="confirm">
+                                        <button type="submit" class="rounded-lg bg-signal-500 px-4 py-2 text-sm font-semibold text-iron-900 hover:bg-signal-400">
+                                            {{ 'coach.confirm'|trans }}
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{{ path('coach_booking_respond', {id: booking.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('booking') }}">
+                                        <input type="hidden" name="decision" value="decline">
+                                        <button type="submit" class="rounded-lg border border-iron-700 px-4 py-2 text-sm font-medium text-iron-100 hover:border-signal-500 hover:text-signal-500">
+                                            {{ 'coach.decline'|trans }}
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% if booking.notes %}
+                            <p class="mt-4 rounded-lg bg-iron-900 px-4 py-3 text-sm text-iron-200">{{ booking.notes }}</p>
+                        {% endif %}
+
+                        {% if booking.status.awaitsResponse %}
+                            <p class="mt-3 text-xs uppercase tracking-wide text-signal-500">
+                                {{ 'coach.bookings.awaiting'|trans }}
+                            </p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mt-4 rounded-xl border border-iron-800 bg-iron-800/40 px-6 py-5 text-iron-200">
+                {{ 'coach.bookings.empty'|trans }}
+            </p>
+        {% endif %}
+    </section>
+{% endblock %}

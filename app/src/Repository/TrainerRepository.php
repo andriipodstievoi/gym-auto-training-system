@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Branch;
 use App\Entity\Trainer;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,6 +48,27 @@ class TrainerRepository extends ServiceEntityRepository
             ->orderBy('t.fullName', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * The coach profile this login belongs to, if any.
+     *
+     * There is no ROLE_TRAINER and no second firewall: "is a coach" is simply
+     * "some trainer row points at this account", which is one fact in one
+     * place rather than a role that can drift out of step with it.
+     */
+    public function findOneByUser(User $user): ?Trainer
+    {
+        /** @var Trainer|null $trainer */
+        $trainer = $this->createQueryBuilder('t')
+            ->addSelect('b')
+            ->leftJoin('t.branch', 'b')
+            ->andWhere('t.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $trainer;
     }
 
     public function findOneActiveBySlug(string $slug): ?Trainer

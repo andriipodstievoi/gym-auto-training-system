@@ -8,6 +8,7 @@ nav:
     trainers: Treneri
     shop: Veikals
     cart: Grozs
+    messages: Ziņas
     quiz: Saņem savu plānu
     menu: Izvēlne
     soon: Drīzumā
@@ -135,14 +136,18 @@ trainer:
     index:
         kicker: "Treniņi ar treneri"
         title: "Mūsu treneri"
-        lead: "Iepazīsti komandu pēc specializācijas, valodas un filiāles. Pieteikšanās būs pieejama drīzumā."
+        lead: "Iepazīsti komandu pēc specializācijas, valodas un filiāles un piesakies nodarbībai."
     specialities: "Specializācija"
+    book_cta: "Pieteikties nodarbībai"
+    message_cta: "Rakstīt trenerim"
+    no_availability: "Šim trenerim pašlaik nav brīvu laiku. Uzraksti viņam, un laiks atradīsies."
+    next_slots: "Tuvākie brīvie laiki"
+    sign_in_to_book: "Pieteikties, lai rezervētu"
     languages: "Valodas"
     rate: "%amount% / stundā"
     branch: "Filiāle"
     branch_unassigned: "Visās filiālēs"
     profile: "Skatīt profilu"
-    booking_soon: "Pieteikšanās tiešsaistē būs pieejama drīzumā."
     show:
         back: "Visi treneri"
         about: "Par treneri"
@@ -196,6 +201,17 @@ account:
         overview: "Pārskats"
         profile: "Profils"
         orders: "Pasūtījumi"
+        bookings: "Rezervācijas"
+    bookings:
+        title: "Tavas rezervācijas"
+        lead: "Nodarbības, ko esi pieteicis pie mūsu treneriem."
+        empty: "Tu vēl neesi pieteicies nevienai nodarbībai."
+        upcoming: "Gaidāmās"
+        past: "Bijušās"
+        cancel: "Atcelt"
+        when: "Kad"
+        coach: "Treneris"
+        status: "Statuss"
     orders:
         title: "Tavi pasūtījumi"
         lead: "Viss, ko esi iegādājies veikalā."
@@ -263,6 +279,36 @@ email:
         heading: "Pasūtījums %reference% apstiprināts"
         body: "Paldies. Maksājums ir saņemts, un mēs jau komplektējam tavu pasūtījumu."
         cta: "Apskatīt pasūtījumus"
+    booking_requested:
+        subject: "Jauns nodarbības pieprasījums"
+        heading: "%member% lūdz nodarbību"
+        body: "Klūts ir pieteicies nodarbībai %when%. Apstiprini vai noraidi to sava trenera sadaļā."
+        cta: "Atvērt trenera sadaļu"
+    booking_requested_member:
+        subject: "Tavs pieprasījums nodots trenerim"
+        heading: "Pieprasījums nosūtīts: %coach%"
+        body: "Treneris to drīz apstiprinās vai noraidīs, un mēs tev par to aizsūtīsim e-pastu."
+        cta: "Apskatīt rezervācijas"
+    booking_confirmed:
+        subject: "Tava nodarbība ir apstiprināta"
+        heading: "Apstiprināts: %when%"
+        body: "%coach% ir apstiprinājis tavu nodarbību. Tiekāmies zālē."
+        cta: "Apskatīt rezervācijas"
+    booking_declined:
+        subject: "Nodarbības pieprasījums noraidīts"
+        heading: "%coach% nevarēja uzņemt %when%"
+        body: "Šis laiks neizdevās. Izvēlies citu vai uzraksti trenerim, lai vienotos."
+        cta: "Apskatīt rezervācijas"
+    booking_cancelled:
+        subject: "Nodarbība atcelta"
+        heading: "Atcelts: %when%"
+        body: "Nodarbība %when% ir atcelta."
+        cta: "Apskatīt rezervācijas"
+    message:
+        subject: "Jauna ziņa"
+        heading: "%sender% tev rakstīja"
+        body: "Tev ir jauna ziņa. Izlasi to un atbildi sadaļā Ziņas."
+        cta: "Lasīt ziņu"
 
 shop:
     index:
@@ -331,3 +377,80 @@ shop:
             cancelled: "Atcelts"
             expired: "Nokavēts"
             fulfilled: "Nosūtīts"
+
+booking:
+    kicker: "Rezervācija"
+    title: "Piesakās nodarbībai pie %coach%"
+    lead: "Izvēlies sev pieņemamu laiku. Treneris to apstiprinās, un abi saņemsiet e-pastu."
+    slots:
+        title: "Brīvie laiki"
+        none: "Tuvāko divu nedēļu laikā brīvu laiku nav."
+        pick: "Izvēlies laiku"
+        book: "Rezervēt šo laiku"
+    form:
+        notes: "Pie kā gribi strādāt?"
+        notes_help: "Nav obligāti. Traumas, mērķi, vingrinājums, kas nepadās."
+        submit: "Pieteikt nodarbību"
+        when: "Kad"
+        price: "Cena"
+        duration: "Ilgums"
+    status:
+        requested: "Gaida apstiprinājumu"
+        confirmed: "Apstiprināts"
+        declined: "Noraidīts"
+        cancelled: "Atcelts"
+        completed: "Notikusi"
+    flash:
+        requested: "Nodarbība pieteikta. Treneris to drīz apstiprinās."
+        cancelled: "Nodarbība atcelta."
+        confirmed: "Nodarbība apstiprināta."
+        declined: "Nodarbība noraidīta."
+        invalid_token: "Šī forma novēlojusies. Mēģini vēlreiz."
+        slot_taken: "Šo laiku tikko aņēma kMads cits. Lūdzu, izvēlies citu."
+        not_allowed: "Šī rezervācija nav tava."
+        past: "Šī nodarbība jau ir notikusi."
+
+coach:
+    kicker: "Trenera sadaļa"
+    title: "Tavs grafiks"
+    lead: "Nodarbības, ko pieteikuši klūti, un tavas darba stundas."
+    nav:
+        label: "Trenera sadaļas"
+        dashboard: "Grafiks"
+        availability: "Darba laiki"
+    bookings:
+        title: "Nodarbības"
+        empty: "Pagaidām nekas nav pieteikts."
+        awaiting: "Gaida tavu atbildi"
+    confirm: "Apstiprināt"
+    decline: "Noraidīt"
+    member: "Klūts"
+    availability:
+        title: "Kad tu strādā"
+        lead: "Nedēļas stundas, kurās klūti var pieteikties."
+        empty: "Tu vēl neesi norādījis stundas, tāpēc pie tevis nevar pieteikties."
+        weekday: "Diena"
+        from: "No"
+        to: "Līdz"
+        add: "Pievienot stundas"
+        remove: "Noņemt"
+    flash:
+        confirmed: "Nodarbība apstiprināta."
+        declined: "Nodarbība noraidīta."
+        availability_added: "Stundas pievienotas."
+        availability_removed: "Stundas noņemtas."
+        invalid_token: "Šī forma novēlojusies. Mēģini vēlreiz."
+
+message:
+    title: "Ziņas"
+    lead: "Tavas sarunas ar treneriem."
+    empty: "Pagaidām sarunu nav."
+    thread_with: "Saruna ar %name%"
+    send: "Sūtīt"
+    body: "Ziņa"
+    placeholder: "Raksti savu ziņu"
+    unread: "Nelasīts"
+    start: "Sākt sarunu"
+    flash:
+        sent: "Ziņa nosūtīta."
+        invalid_token: "Šī forma novēlojusies. Mēģini vēlreiz."

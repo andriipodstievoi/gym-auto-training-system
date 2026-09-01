@@ -8,6 +8,7 @@ nav:
     trainers: Trainers
     shop: Shop
     cart: Cart
+    messages: Messages
     quiz: Get your plan
     menu: Menu
     soon: Coming soon
@@ -135,14 +136,18 @@ trainer:
     index:
         kicker: "Coaching"
         title: "Our trainers"
-        lead: "Browse the team by speciality, language and branch. Booking opens shortly."
+        lead: "Browse the team by speciality, language and branch, then book a session."
     specialities: "Specialities"
+    book_cta: "Book a session"
+    message_cta: "Message this coach"
+    no_availability: "This coach has no open slots at the moment. Message them and they will find a time."
+    next_slots: "Next free slots"
+    sign_in_to_book: "Sign in to book"
     languages: "Speaks"
     rate: "%amount% / hour"
     branch: "Based at"
     branch_unassigned: "Across all branches"
     profile: "View profile"
-    booking_soon: "Online booking is coming soon."
     show:
         back: "All trainers"
         about: "About"
@@ -196,6 +201,17 @@ account:
         overview: "Overview"
         profile: "Profile"
         orders: "Orders"
+        bookings: "Bookings"
+    bookings:
+        title: "Your bookings"
+        lead: "Sessions you have booked with our coaches."
+        empty: "You have not booked a session yet."
+        upcoming: "Upcoming"
+        past: "Past"
+        cancel: "Cancel"
+        when: "When"
+        coach: "Coach"
+        status: "Status"
     orders:
         title: "Your orders"
         lead: "Everything you have bought from the shop."
@@ -263,6 +279,36 @@ email:
         heading: "Order %reference% confirmed"
         body: "Thank you. We have your payment and are packing your order now."
         cta: "See my orders"
+    booking_requested:
+        subject: "New session request"
+        heading: "%member% asked for a session"
+        body: "A member has requested a session on %when%. Confirm or decline it from your coach area."
+        cta: "Open my coach area"
+    booking_requested_member:
+        subject: "We passed your request to your coach"
+        heading: "Request sent to %coach%"
+        body: "Your coach will confirm or decline it shortly, and we will email you either way."
+        cta: "See my bookings"
+    booking_confirmed:
+        subject: "Your session is confirmed"
+        heading: "Confirmed for %when%"
+        body: "%coach% has confirmed your session. See you at the gym."
+        cta: "See my bookings"
+    booking_declined:
+        subject: "Your session request was declined"
+        heading: "%coach% could not take %when%"
+        body: "That slot did not work out. Pick another time, or message the coach to arrange one."
+        cta: "See my bookings"
+    booking_cancelled:
+        subject: "A session was cancelled"
+        heading: "Cancelled: %when%"
+        body: "The session on %when% has been cancelled."
+        cta: "See my bookings"
+    message:
+        subject: "New message"
+        heading: "%sender% wrote to you"
+        body: "You have a new message waiting. Read it and reply from your messages."
+        cta: "Read the message"
 
 shop:
     index:
@@ -331,3 +377,80 @@ shop:
             cancelled: "Cancelled"
             expired: "Expired"
             fulfilled: "Sent"
+
+booking:
+    kicker: "Booking"
+    title: "Book a session with %coach%"
+    lead: "Pick a time that suits you. Your coach confirms it, and you both get an email."
+    slots:
+        title: "Free slots"
+        none: "No free slots in the next two weeks."
+        pick: "Pick a time"
+        book: "Book this slot"
+    form:
+        notes: "What do you want to work on?"
+        notes_help: "Optional. Injuries, goals, a lift you are stuck on."
+        submit: "Request this session"
+        when: "When"
+        price: "Price"
+        duration: "Duration"
+    status:
+        requested: "Awaiting confirmation"
+        confirmed: "Confirmed"
+        declined: "Declined"
+        cancelled: "Cancelled"
+        completed: "Completed"
+    flash:
+        requested: "Your session has been requested. The coach will confirm it shortly."
+        cancelled: "The session has been cancelled."
+        confirmed: "The session has been confirmed."
+        declined: "The session has been declined."
+        invalid_token: "That form expired. Please try again."
+        slot_taken: "Somebody just took that slot. Please pick another."
+        not_allowed: "That booking is not yours."
+        past: "That session has already happened."
+
+coach:
+    kicker: "Coach area"
+    title: "Your schedule"
+    lead: "Sessions your members have requested, and the hours you work."
+    nav:
+        label: "Coach sections"
+        dashboard: "Schedule"
+        availability: "Availability"
+    bookings:
+        title: "Sessions"
+        empty: "Nothing booked yet."
+        awaiting: "Awaiting your answer"
+    confirm: "Confirm"
+    decline: "Decline"
+    member: "Member"
+    availability:
+        title: "When you work"
+        lead: "Weekly hours members can book inside."
+        empty: "You have not set any hours yet, so nobody can book you."
+        weekday: "Day"
+        from: "From"
+        to: "To"
+        add: "Add hours"
+        remove: "Remove"
+    flash:
+        confirmed: "Session confirmed."
+        declined: "Session declined."
+        availability_added: "Those hours have been added."
+        availability_removed: "Those hours have been removed."
+        invalid_token: "That form expired. Please try again."
+
+message:
+    title: "Messages"
+    lead: "Your conversations with coaches."
+    empty: "No conversations yet."
+    thread_with: "Conversation with %name%"
+    send: "Send"
+    body: "Message"
+    placeholder: "Write your message"
+    unread: "Unread"
+    start: "Start a conversation"
+    flash:
+        sent: "Your message has been sent."
+        invalid_token: "That form expired. Please try again."

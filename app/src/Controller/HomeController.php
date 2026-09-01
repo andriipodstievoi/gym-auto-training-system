@@ -44,7 +44,7 @@ final class HomeController extends AbstractController
             'detail' => 'Registration, login, membership tiers and Stripe test-mode checkout with webhooks.'],
         ['id' => 'M4', 'title' => 'Shop', 'done' => true,
             'detail' => 'Catalogue, variants, cart, orders and order history for clothing and supplements.'],
-        ['id' => 'M5', 'title' => 'Trainers & booking', 'done' => false,
+        ['id' => 'M5', 'title' => 'Trainers & booking', 'done' => true,
             'detail' => 'Coach profiles, availability, session booking and messaging with email notifications.'],
         ['id' => 'M6', 'title' => 'Automatic training system', 'done' => false,
             'detail' => 'The assessment, the Python rule engine, the LLM coaching layer and PDF plan export.'],

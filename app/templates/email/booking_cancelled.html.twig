@@ -1,0 +1,22 @@
+{% extends 'email/_layout.html.twig' %}
+
+{% set when = booking.startsAt|format_datetime('full', 'short', locale=locale, timezone=gym_timezone()) %}
+
+{% block subject %}{{ 'email.booking_cancelled.subject'|trans({}, 'messages', locale) }}{% endblock %}
+
+{% block content %}
+    <p style="margin:0 0 16px;font-size:20px;font-weight:bold;color:#ffffff;">
+        {{ 'email.booking_cancelled.heading'|trans({'%when%': when}, 'messages', locale) }}
+    </p>
+
+    <p style="margin:0 0 20px;">
+        {{ 'email.booking_cancelled.body'|trans({'%when%': when}, 'messages', locale) }}
+    </p>
+
+    <p style="margin:24px 0 0;">
+        <a href="{{ url('app_account_bookings', {'_locale': locale}) }}"
+           style="display:inline-block;background:#84cc16;color:#18181b;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">
+            {{ 'email.booking_cancelled.cta'|trans({}, 'messages', locale) }}
+        </a>
+    </p>
+{% endblock %}
