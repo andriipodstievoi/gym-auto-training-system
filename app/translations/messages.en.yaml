@@ -9,6 +9,7 @@ nav:
     shop: Shop
     cart: Cart
     messages: Messages
+    plan: My plan
     quiz: Get your plan
     menu: Menu
     soon: Coming soon
@@ -202,6 +203,16 @@ account:
         profile: "Profile"
         orders: "Orders"
         bookings: "Bookings"
+        plans: "Training plans"
+    plans:
+        title: "Your training plans"
+        lead: "Every programme the assessment has generated for you."
+        empty: "You have not completed the assessment yet."
+        start: "Start the assessment"
+        generated: "Generated"
+        view: "Open"
+        goal: "Goal"
+        split: "Split"
     bookings:
         title: "Your bookings"
         lead: "Sessions you have booked with our coaches."
@@ -454,3 +465,96 @@ message:
     flash:
         sent: "Your message has been sent."
         invalid_token: "That form expired. Please try again."
+
+assessment:
+    kicker: "Automatic training system"
+    title: "Build my programme"
+    lead: "Twelve questions. You get a periodised programme matched to your goal, your week, the equipment you actually have and the injuries you actually carry."
+    submit: "Generate my programme"
+    optional: "Optional"
+    step:
+        profile: "About you"
+        goal: "What you are training for"
+        schedule: "Your week"
+        equipment: "What you train with"
+        health: "Health screening"
+    field:
+        age: "Age"
+        height_cm: "Height in cm"
+        weight_kg: "Weight in kg"
+        days_per_week: "Training days a week"
+        minutes_per_session: "Minutes per session"
+        experience: "Training experience"
+        goal: "Main goal"
+        equipment: "Equipment"
+        limitations: "Anything that hurts"
+        limitations_help: "Tick anything a coach should program around. We exclude the movements that aggravate it."
+        disliked: "Exercises you would rather not do"
+        disliked_help: "One per line. We leave them out."
+    goal:
+        fat_loss: "Lose fat"
+        muscle_gain: "Build muscle"
+        strength: "Get stronger"
+        general_fitness: "General fitness"
+    experience:
+        beginner: "Under six months"
+        intermediate: "Six months to two years"
+        advanced: "Over two years"
+    equipment:
+        full_gym: "A full gym"
+        home_basic: "Dumbbells, bands, a pull-up bar"
+        bodyweight: "Bodyweight only"
+    limitation:
+        shoulder: "Shoulder"
+        lower_back: "Lower back"
+        knee: "Knee"
+        elbow: "Elbow"
+        hip: "Hip"
+        neck: "Neck"
+    parq:
+        title: "Health screening"
+        lead: "A standard pre-exercise questionnaire. Answer honestly - a yes does not mean you cannot train, it means a doctor should look before we write you a programme."
+        heart_condition: "Has a doctor ever said you have a heart condition?"
+        chest_pain: "Do you feel pain in your chest when you do physical activity?"
+        dizziness_or_fainting: "Do you lose your balance from dizziness, or ever lose consciousness?"
+        bone_or_joint_problem: "Do you have a bone or joint problem that could be made worse by exercise?"
+        blood_pressure_medication: "Are you currently taking medication for blood pressure or a heart condition?"
+        recent_surgery: "Have you had surgery in the last three months?"
+        pregnancy: "Are you pregnant, or have you given birth in the last six months?"
+        other_reason_not_to_exercise: "Do you know of any other reason you should not do physical activity?"
+    flash:
+        generated: "Your programme is ready."
+        unavailable: "The programme service is not answering right now. Nothing was lost - try again in a moment."
+        invalid_token: "That form expired. Please try again."
+        not_allowed: "That programme is not yours."
+
+plan:
+    title: "Your programme"
+    lead: "%split%, %weeks% weeks, %days% days a week."
+    kicker: "Your programme"
+    split: "Split"
+    weeks: "Weeks"
+    days_per_week: "Days a week"
+    generated_at: "Generated"
+    engine: "Engine"
+    week: "Week %number%"
+    deload: "Deload"
+    deload_note: "A lighter week on purpose. Recovery is where the training you already did turns into progress."
+    day: "Day"
+    exercise: "Exercise"
+    sets: "Sets"
+    reps: "Reps"
+    rir: "RIR"
+    rir_help: "Reps in reserve - how many you should still have left when you stop the set."
+    notes: "Notes"
+    coaching_notes: "From your coach"
+    download_pdf: "Download as PDF"
+    regenerate: "Retake the assessment"
+    disclaimer: "This programme is general fitness guidance, not medical advice. Stop and consult a physician if you experience pain, dizziness or chest discomfort."
+    llm_note: "Coaching notes were written by our AI layer. Every set, rep and load was computed by the rule engine."
+    referral:
+        title: "Please see a doctor first"
+        lead: "Your answers include something that should be cleared medically before you start a new programme."
+        body: "This is not a refusal. Bring us clearance and our trainers will build around whatever you need."
+        flags: "What you flagged"
+        contact: "Talk to a trainer"

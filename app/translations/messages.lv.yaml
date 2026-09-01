@@ -9,6 +9,7 @@ nav:
     shop: Veikals
     cart: Grozs
     messages: Ziņas
+    plan: Mans plāns
     quiz: Saņem savu plānu
     menu: Izvēlne
     soon: Drīzumā
@@ -202,6 +203,16 @@ account:
         profile: "Profils"
         orders: "Pasūtījumi"
         bookings: "Rezervācijas"
+        plans: "Treniņu plāni"
+    plans:
+        title: "Tavi treniņu plāni"
+        lead: "Visas programmas, ko anketa tev ir sagatavojusi."
+        empty: "Tu vēl neesi aizpildījis anketu."
+        start: "Sākt anketu"
+        generated: "Sagatavots"
+        view: "Atvērt"
+        goal: "Mērķis"
+        split: "Sadalījums"
     bookings:
         title: "Tavas rezervācijas"
         lead: "Nodarbības, ko esi pieteicis pie mūsu treneriem."
@@ -454,3 +465,96 @@ message:
     flash:
         sent: "Ziņa nosūtīta."
         invalid_token: "Šī forma novēlojusies. Mēģini vēlreiz."
+
+assessment:
+    kicker: "Automātiskā treniņu sistēma"
+    title: "Izveido manu programmu"
+    lead: "Divpadsmit jautājumi. Tu saņem periodizētu programmu, kas atbilst tavam mērķim, tavai nedēļai, pieejamajam invententāram un tavām traumām."
+    submit: "Sagatavot programmu"
+    optional: "Nav obligāti"
+    step:
+        profile: "Par tevi"
+        goal: "Ko tu gribi sasniegt"
+        schedule: "Tava nedēļa"
+        equipment: "Ar ko tu trenējies"
+        health: "Veselības anketa"
+    field:
+        age: "Vecums"
+        height_cm: "Augums cm"
+        weight_kg: "Svars kg"
+        days_per_week: "Treniņu dienas nedēļā"
+        minutes_per_session: "Minūtes vienā treniņā"
+        experience: "Treniņu pieredze"
+        goal: "Galvenais mērķis"
+        equipment: "Inventārs"
+        limitations: "Kas sāp"
+        limitations_help: "Atzīmē visu, kas jāņem vērā. Mēs izslēgsim kustības, kas to saasina."
+        disliked: "Vingrinājumi, ko negribi darīt"
+        disliked_help: "Katru jaunā rindā. Mēs tos izlaidīsim."
+    goal:
+        fat_loss: "Samazināt tauku daudzumu"
+        muscle_gain: "Augēt muskuļus"
+        strength: "Kļūt stiprākam"
+        general_fitness: "Vispārējā formā"
+    experience:
+        beginner: "Mazāk par sešiem mēnešiem"
+        intermediate: "No sešiem mēnešiem līdz diviem gadiem"
+        advanced: "Vairāk par diviem gadiem"
+    equipment:
+        full_gym: "Pilnība aprīkota zāle"
+        home_basic: "Hanteles, gumijas, stienis pievilkšanās"
+        bodyweight: "Tikai sava ķermeņa svars"
+    limitation:
+        shoulder: "Plecs"
+        lower_back: "Muguras lejasdaļa"
+        knee: "Celis"
+        elbow: "Elkonis"
+        hip: "Gūža"
+        neck: "Kakls"
+    parq:
+        title: "Veselības anketa"
+        lead: "Standarta anketa pirms treniņiem. Atbildi godīgi — „jā“ nenozīmē, ka nedrīksti trenēties, bet ka pirms programmas tevi jāapskata ārstam."
+        heart_condition: "Vai ārsts kadreiz ir teicis, ka tev ir sirds slimība?"
+        chest_pain: "Vai fiziskās aktivitātes laikā jūti sāpes krūtīs?"
+        dizziness_or_fainting: "Vai reiboņa dēļ zaudē līdzsvaru vai kadreiz zaudē samoņu?"
+        bone_or_joint_problem: "Vai tev ir kaulu vai locītavu problēma, ko treniņš varētu pasliktināt?"
+        blood_pressure_medication: "Vai pašlaik lieto medikamentus asinsspiedienam vai sirdij?"
+        recent_surgery: "Vai pēdējos trīs mēnešos tev ir bijusi operācija?"
+        pregnancy: "Vai esi grūtniece vai dzēmusi pēdējo sešu mēnešu laikā?"
+        other_reason_not_to_exercise: "Vai zini kādu citu iemeslu, kāpēc nevajadzētu trenēties?"
+    flash:
+        generated: "Tava programma ir gatava."
+        unavailable: "Programmu serviss pašlaik neatbild. Nekas nav zaudēts - mēģini vēlreiz pēc brīža."
+        invalid_token: "Šī forma novēlojusies. Mēģini vēlreiz."
+        not_allowed: "Šī programma nav tava."
+
+plan:
+    title: "Tava programma"
+    lead: "%split%, %weeks% nedēļas, %days% dienas nedēļā."
+    kicker: "Tava programma"
+    split: "Sadalījums"
+    weeks: "Nedēļas"
+    days_per_week: "Dienas nedēļā"
+    generated_at: "Sagatavots"
+    engine: "Dzinējs"
+    week: "%number%. nedēļa"
+    deload: "Atslodze"
+    deload_note: "Apzināti vieglāka nedēļa. Tieši atjaunojoties padarītais darbs pārvēršas rezultātā."
+    day: "Diena"
+    exercise: "Vingrinājums"
+    sets: "Pieejas"
+    reps: "Atkārtojumi"
+    rir: "RIR"
+    rir_help: "Rezervē atstātie atkārtojumi - cik vēl varētu izdarīt, beidzot pieeju."
+    notes: "Piezīmes"
+    coaching_notes: "No tava trenera"
+    download_pdf: "Lejupielādēt PDF"
+    regenerate: "Aizpildīt anketu vēlreiz"
+    disclaimer: "Šī programma ir vispārīgi fitnesa ieteikumi, nevis medicīnisks padoms. Pārtrauc un vērsies pie ārsta, ja jūti sāpes, reiboņi vai diskomfortu krūtīs."
+    llm_note: "Trenera piezīmes rakstīja mūsu MI slānis. Katru pieeju, atkārtojumu un svaru aprēķināja likumu dzinējs."
+    referral:
+        title: "Lūdzu, vispirms aizej pie ārsta"
+        lead: "Tavās atbildēs ir kaut kas, kas pirms jaunas programmas jāpārbauda medicīniski."
+        body: "Šis nav atteikums. Atnes atzinumu, un mūsu treneri visu izveidos ap tavu situāciju."
+        flags: "Ko tu atzīmēji"
+        contact: "Runāt ar treneri"

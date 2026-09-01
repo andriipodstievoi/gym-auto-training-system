@@ -4,7 +4,15 @@ The rule engine decides every number in a plan: split, weekly set volume,
 intensity targets, progression model and exercise selection. The LLM layer
 (``app.llm``) only ever writes prose on top of what this module produced.
 
-Implemented in milestone M6.
+The public surface is deliberately two names. Everything else - the
+catalogue, the split templates, the volume tables, the mesocycle - is an
+implementation detail of ``generate_plan``, free to change behind a version
+bump.
 """
 
-ENGINE_VERSION = "0.1.0-stub"
+from __future__ import annotations
+
+from app.engine.generator import generate_plan
+from app.engine.version import ENGINE_VERSION
+
+__all__ = ["ENGINE_VERSION", "generate_plan"]

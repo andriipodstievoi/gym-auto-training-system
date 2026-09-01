@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     llm_model: str = "claude-opus-5"
 
+    #: A member is waiting on the plan request, so the prose layer runs on a
+    #: short leash. Exceeding it degrades to the engine-only plan.
+    llm_timeout_seconds: float = 20.0
+    llm_max_retries: int = 1
+
     @property
     def llm_enabled(self) -> bool:
         return bool(self.anthropic_api_key)
