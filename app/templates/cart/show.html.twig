@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% set locale = app.request.locale %}
+
+{% block title %}{{ 'shop.cart.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'shop.cart.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-4xl px-4 pt-14 pb-8">
+        <h1 class="text-4xl font-black leading-tight text-white">{{ 'shop.cart.title'|trans }}</h1>
+        <p class="mt-4 max-w-2xl text-lg text-iron-200">{{ 'shop.cart.lead'|trans }}</p>
+    </section>
+
+    <section class="mx-auto max-w-4xl px-4 pb-16">
+        {% include 'partials/_flashes.html.twig' %}
+
+        {% if cart.isEmpty %}
+            <div class="rounded-xl border border-iron-800 bg-iron-800/40 p-7">
+                <p class="text-iron-200">{{ 'shop.cart.empty'|trans }}</p>
+                <a href="{{ path('shop_index') }}"
+                   class="mt-5 inline-block rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
+                    {{ 'shop.cart.empty_cta'|trans }}
+                </a>
+            </div>
+        {% else %}
+            <div class="overflow-x-auto rounded-xl border border-iron-800">
+                <table class="w-full min-w-[40rem] text-left text-sm">
+                    <caption class="sr-only">{{ 'shop.cart.title'|trans }}</caption>
+                    <thead class="bg-iron-800/60 text-xs uppercase tracking-wide text-iron-400">
+                        <tr>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.cart.item'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.cart.unit_price'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.cart.quantity'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.cart.line_total'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold"><span class="sr-only">{{ 'shop.cart.remove'|trans }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-iron-800 text-iron-200">
+                        {% for line in cart.lines %}
+                            {% set field_id = 'quantity-' ~ loop.index %}
+                            <tr>
+                                <td class="px-5 py-4 font-medium text-white">
+                                    <a href="{{ path('shop_product', {slug: line.product.slug}) }}" class="hover:text-signal-500">
+                                        {{ line.getName().get(locale) }}
+                                    </a>
+                                    <span class="mt-1 block text-xs uppercase tracking-wide text-iron-400">{{ line.getSku() }}</span>
+                                </td>
+                                <td class="px-5 py-4">{{ (line.unitPriceCents / 100)|format_currency('EUR') }}</td>
+                                <td class="px-5 py-4">
+                                    <form method="post" action="{{ path('cart_update') }}" class="flex items-center gap-2">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                                        <input type="hidden" name="key" value="{{ line.key }}">
+                                        <label for="{{ field_id }}" class="sr-only">
+                                            {{ 'shop.cart.quantity'|trans }}: {{ line.getName().get(locale) }}
+                                        </label>
+                                        <input id="{{ field_id }}" name="quantity" type="number" inputmode="numeric"
+                                               min="1" max="{{ line.availableStock }}" value="{{ line.quantity }}"
+                                               class="w-20 rounded-lg border border-iron-700 bg-iron-900 px-2 py-1.5 text-white">
+                                        <button type="submit" class="rounded-lg border border-iron-600 px-3 py-1.5 text-xs font-semibold text-white hover:border-signal-500 hover:text-signal-500">
+                                            {{ 'shop.cart.update'|trans }}
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="px-5 py-4 font-semibold text-white">{{ (line.getLineTotalCents() / 100)|format_currency('EUR') }}</td>
+                                <td class="px-5 py-4 text-right">
+                                    <form method="post" action="{{ path('cart_remove') }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                                        <input type="hidden" name="key" value="{{ line.key }}">
+                                        <button type="submit" class="text-xs font-semibold text-iron-400 hover:text-signal-500">
+                                            {{ 'shop.cart.remove'|trans }}
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-iron-800 bg-iron-800/40 px-6 py-5">
+                <p class="text-sm uppercase tracking-wide text-iron-400">
+                    {{ 'shop.cart.total'|trans }}
+                    <strong class="ml-3 text-2xl font-black text-white">{{ (cart.totalCents / 100)|format_currency('EUR') }}</strong>
+                </p>
+                <p class="text-sm text-iron-400">{{ 'shop.cart.count'|trans({'%count%': cart.count}) }}</p>
+            </div>
+
+            <div class="mt-6 flex flex-wrap items-center gap-4">
+                {% if not checkout_available %}
+                    <p class="rounded-lg border border-iron-700 px-4 py-2.5 text-sm text-iron-400">
+                        {{ 'shop.checkout.unavailable'|trans }}
+                    </p>
+                {% elseif app.user %}
+                    <form method="post" action="{{ path('shop_checkout_start') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
+                        <button type="submit"
+                                class="rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+                            {{ 'shop.cart.checkout'|trans }}
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{{ path('app_login') }}"
+                       class="rounded-lg border border-iron-600 px-6 py-3 font-semibold text-white hover:border-signal-500 hover:text-signal-500">
+                        {{ 'membership.sign_in_to_join'|trans }}
+                    </a>
+                {% endif %}
+
+                <a href="{{ path('shop_index') }}" class="text-sm font-semibold text-signal-500 hover:text-signal-400">
+                    {{ 'shop.cart.continue'|trans }}
+                </a>
+            </div>
+
+            <p class="mt-6 rounded-xl border border-iron-800 bg-iron-800/40 px-6 py-4 text-sm text-iron-400">
+                {{ checkout_available ? 'shop.checkout.note'|trans : 'shop.checkout.unavailable_note'|trans }}
+            </p>
+        {% endif %}
+    </section>
+{% endblock %}

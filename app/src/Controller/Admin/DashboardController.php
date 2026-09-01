@@ -51,6 +51,8 @@ final class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(UserMembershipCrudController::class, 'Memberships sold', 'fa fa-address-card');
         yield MenuItem::linkTo(ProductCategoryCrudController::class, 'Product categories', 'fa fa-tags');
         yield MenuItem::linkTo(ProductCrudController::class, 'Products', 'fa fa-box');
+        yield MenuItem::linkTo(ProductVariantCrudController::class, 'Product variants', 'fa fa-layer-group');
+        yield MenuItem::linkTo(OrderCrudController::class, 'Orders', 'fa fa-receipt');
 
         yield MenuItem::section('People');
         yield MenuItem::linkTo(UserCrudController::class, 'Users', 'fa fa-user');

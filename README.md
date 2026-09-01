@@ -61,7 +61,7 @@ loads. The site produces valid programmes with no API key configured.
 | **M1** | Domain model, migrations, fixtures, back office | ✅ done |
 | **M2** | Public site, Leaflet branch map, SVG floor plan | ✅ done |
 | **M3** | Accounts, memberships, Stripe test checkout | ✅ done |
-| M4 | Shop — catalogue, cart, orders | planned |
+| **M4** | Shop — catalogue, cart, orders | ✅ done |
 | M5 | Trainers, availability, booking, messaging | planned |
 | M6 | Assessment, rule engine, LLM layer, PDF export | planned |
 | M7 | Coverage, docs, screenshots | planned |

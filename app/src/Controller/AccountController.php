@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\Model\ChangePassword;
 use App\Form\ProfileFormType;
+use App\Repository\OrderRepository;
 use App\Repository\UserMembershipRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,6 +34,14 @@ final class AccountController extends AbstractController
         return $this->render('account/index.html.twig', [
             'current' => $memberships->findCurrentFor($user),
             'history' => $memberships->findHistoryFor($user),
+        ]);
+    }
+
+    #[Route('/{_locale}/account/orders', name: 'app_account_orders', requirements: ['_locale' => 'en|lv|ru'], methods: ['GET'])]
+    public function orders(#[CurrentUser] User $user, OrderRepository $orders): Response
+    {
+        return $this->render('account/orders.html.twig', [
+            'orders' => $orders->findHistoryFor($user),
         ]);
     }
 

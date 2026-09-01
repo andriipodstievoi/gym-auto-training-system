@@ -7,6 +7,7 @@ nav:
     memberships: Memberships
     trainers: Trainers
     shop: Shop
+    cart: Cart
     quiz: Get your plan
     menu: Menu
     soon: Coming soon
@@ -41,7 +42,7 @@ home:
             text: "The assessment feeds a programme generator: split, volume, progression and exercise selection, all computed for you."
     status:
         title: "Build status"
-        lead: "The public site is live through M2. Everything still marked planned is scheduled."
+        lead: "Accounts, memberships and the shop are live. Everything still marked planned is scheduled."
 
 footer:
     address: "Rīga, Latvia"
@@ -194,6 +195,12 @@ account:
         label: "Account sections"
         overview: "Overview"
         profile: "Profile"
+        orders: "Orders"
+    orders:
+        title: "Your orders"
+        lead: "Everything you have bought from the shop."
+        empty: "You have not ordered anything yet."
+        view: "Browse the shop"
     membership:
         title: "Your membership"
         paid: "Paid"
@@ -251,3 +258,76 @@ email:
         heading: "Your membership is active"
         body: "Your %plan% membership is confirmed. Show your account at reception on your first visit."
         cta: "Open my account"
+    order:
+        subject: "Your SPĒKS order is confirmed"
+        heading: "Order %reference% confirmed"
+        body: "Thank you. We have your payment and are packing your order now."
+        cta: "See my orders"
+
+shop:
+    index:
+        kicker: "Shop"
+        title: "Kit that survives the platform"
+        lead: "Supplements, training clothes and accessories, priced in euro and delivered across Latvia."
+    category:
+        back: "All categories"
+        empty: "Nothing in this section yet."
+    product:
+        back: "Back to the shop"
+        sku: "SKU"
+        in_stock: "In stock"
+        out_of_stock: "Out of stock"
+        choose_variant: "Choose an option"
+        variant_label: "Option"
+        quantity: "Quantity"
+        add_to_cart: "Add to cart"
+        from_price: "from %amount%"
+        unavailable: "Unavailable"
+    cart:
+        title: "Your cart"
+        lead: "Check the quantities, then pay by card."
+        empty: "Your cart is empty."
+        empty_cta: "Browse the shop"
+        item: "Item"
+        unit_price: "Price"
+        quantity: "Quantity"
+        line_total: "Total"
+        total: "Order total"
+        remove: "Remove"
+        update: "Update"
+        checkout: "Pay by card"
+        continue: "Keep shopping"
+        count: "{0}empty|{1}1 item|]1,Inf[ %count% items"
+        adjusted: "We adjusted your cart to the stock we have left."
+    checkout:
+        unavailable: "Checkout unavailable"
+        note: "Payment is handled by Stripe in test mode - no real card is charged."
+        unavailable_note: "Card payment is not configured on this installation, so checkout is switched off. Order at the front desk of any branch."
+    flash:
+        added: "Added to your cart."
+        updated: "Your cart has been updated."
+        removed: "Removed from your cart."
+        invalid_token: "That form expired. Please try again."
+        out_of_stock: "We do not have enough of that in stock."
+        empty: "Your cart is empty."
+        payments_unavailable: "Card payment is not available right now. Please order at the front desk."
+        checkout_failed: "We could not start the payment. Nothing was charged - please try again."
+        checkout_cancelled: "Payment cancelled. Nothing was charged."
+    success:
+        title: "Thank you"
+        lead: "Your order %reference% has been placed."
+        pending: "Stripe is still confirming the payment. This page and your account update within a moment - there is nothing more for you to do."
+        paid: "Payment received. We are packing your order."
+        unknown: "We could not match that payment to an order. If you were charged, contact us and we will sort it out."
+    order:
+        reference: "Order"
+        placed_at: "Placed"
+        status: "Status"
+        total: "Total"
+        items: "Items"
+        state:
+            pending: "Awaiting payment"
+            paid: "Paid"
+            cancelled: "Cancelled"
+            expired: "Expired"
+            fulfilled: "Sent"

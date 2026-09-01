@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% set locale = app.request.locale %}
+
+{% block title %}{{ 'shop.success.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'shop.success.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-2xl px-4 py-16">
+        <h1 class="text-4xl font-black text-white">{{ 'shop.success.title'|trans }}</h1>
+        <p class="mt-4 text-lg text-iron-200">{{ 'shop.success.lead'|trans }}</p>
+
+        {% if order %}
+            <dl class="mt-8 grid gap-5 rounded-xl border border-iron-800 bg-iron-800/40 p-7 sm:grid-cols-3">
+                <div>
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-iron-400">{{ 'shop.order.reference'|trans }}</dt>
+                    <dd class="mt-1 text-lg font-bold text-white">{{ order.reference }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-iron-400">{{ 'shop.order.placed_at'|trans }}</dt>
+                    <dd class="mt-1 text-lg font-bold text-white">{{ order.createdAt|format_date('medium') }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-semibold uppercase tracking-wide text-iron-400">{{ 'shop.order.total'|trans }}</dt>
+                    <dd class="mt-1 text-lg font-bold text-white">{{ (order.totalCents / 100)|format_currency('EUR') }}</dd>
+                </div>
+            </dl>
+
+            <h2 class="mt-10 text-xl font-bold text-white">{{ 'shop.order.items'|trans }}</h2>
+            <ul class="mt-4 divide-y divide-iron-800 rounded-xl border border-iron-800">
+                {% for item in order.items %}
+                    <li class="flex flex-wrap items-baseline justify-between gap-3 px-5 py-4 text-sm">
+                        <span class="font-medium text-white">{{ item.quantity }} × {{ item.nameSnapshot.get(locale) }}</span>
+                        <span class="text-iron-200">{{ (item.getLineTotalCents() / 100)|format_currency('EUR') }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {#
+               The webhook is a separate connection from Stripe and can land
+               after this redirect, so the order may still be pending. Say that
+               plainly rather than claiming a payment that has not been
+               confirmed yet.
+            #}
+            <p class="mt-8 rounded-xl border border-iron-800 bg-iron-800/40 px-6 py-4 text-sm text-iron-300">
+                {{ order.status.value == 'pending' ? 'shop.success.pending'|trans : 'shop.success.paid'|trans }}
+            </p>
+        {% else %}
+            <p class="mt-8 rounded-xl border border-iron-800 bg-iron-800/40 px-6 py-4 text-sm text-iron-300">
+                {{ 'shop.success.unknown'|trans }}
+            </p>
+        {% endif %}
+
+        <a href="{{ path('app_account_orders') }}"
+           class="mt-8 inline-block rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+            {{ 'account.orders.title'|trans }}
+        </a>
+    </section>
+{% endblock %}

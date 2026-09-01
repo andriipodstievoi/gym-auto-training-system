@@ -7,6 +7,7 @@ nav:
     memberships: Abonementi
     trainers: Treneri
     shop: Veikals
+    cart: Grozs
     quiz: Saņem savu plānu
     menu: Izvēlne
     soon: Drīzumā
@@ -41,7 +42,7 @@ home:
             text: "Anketa nonāk programmas ģeneratorā: sadalījums, apjoms, progresija un vingrinājumu izvēle tiek aprēķināti tev."
     status:
         title: "Izstrādes statuss"
-        lead: "Publiskā vietne ir gatava līdz M2. Viss, kas atzīmēts kā plānots, vēl ir priekšā."
+        lead: "Konti, abonementi un veikals jau darbojas. Viss, kas atzīmēts kā plānots, vēl ir priekšā."
 
 footer:
     address: "Rīga, Latvija"
@@ -194,6 +195,12 @@ account:
         label: "Konta sadaļas"
         overview: "Pārskats"
         profile: "Profils"
+        orders: "Pasūtījumi"
+    orders:
+        title: "Tavi pasūtījumi"
+        lead: "Viss, ko esi iegādājies veikalā."
+        empty: "Tev vēl nav neviena pasūtījuma."
+        view: "Apskatīt veikalu"
     membership:
         title: "Tavs abonements"
         paid: "Samaksāts"
@@ -251,3 +258,76 @@ email:
         heading: "Tavs abonements ir aktīvs"
         body: "Tavs %plan% abonements ir apstiprināts. Pirmajā reizē reģistratūrā parādi savu kontu."
         cta: "Atvērt manu kontu"
+    order:
+        subject: "Tavs SPĒKS pasūtījums ir apstiprināts"
+        heading: "Pasūtījums %reference% apstiprināts"
+        body: "Paldies. Maksājums ir saņemts, un mēs jau komplektējam tavu pasūtījumu."
+        cta: "Apskatīt pasūtījumus"
+
+shop:
+    index:
+        kicker: "Veikals"
+        title: "Inventārs, kas iztur platformu"
+        lead: "Uztura bagātinātāji, treniņu apģērbs un aksesuāri eiro cenās ar piegādi visā Latvijā."
+    category:
+        back: "Visas sadaļas"
+        empty: "Šajā sadaļā vēl nekas nav."
+    product:
+        back: "Atpakaļ uz veikalu"
+        sku: "SKU"
+        in_stock: "Noliktavā"
+        out_of_stock: "Nav noliktavā"
+        choose_variant: "Izvēlies variantu"
+        variant_label: "Variants"
+        quantity: "Daudzums"
+        add_to_cart: "Pievienot grozam"
+        from_price: "no %amount%"
+        unavailable: "Nav pieejams"
+    cart:
+        title: "Tavs grozs"
+        lead: "Pārbaudi daudzumus un samaksā ar karti."
+        empty: "Tavs grozs ir tukšs."
+        empty_cta: "Apskatīt veikalu"
+        item: "Prece"
+        unit_price: "Cena"
+        quantity: "Daudzums"
+        line_total: "Kopā"
+        total: "Pasūtījuma summa"
+        remove: "Noņemt"
+        update: "Atjaunināt"
+        checkout: "Maksāt ar karti"
+        continue: "Turpināt iepirkties"
+        count: "{0}tukšs|{1}1 prece|]1,Inf[ %count% preces"
+        adjusted: "Grozs pielāgots atlikumam noliktavā."
+    checkout:
+        unavailable: "Norēķini nav pieejami"
+        note: "Maksājumus apstrādā Stripe testa režīmā - neviena īsta karte netiek debetēta."
+        unavailable_note: "Šajā instalācijā kartes maksājumi nav konfigurēti, tāpēc norēķini ir izslēgti. Pasūti jebkuras filiāles reģistratūrā."
+    flash:
+        added: "Pievienots grozam."
+        updated: "Grozs atjaunināts."
+        removed: "Noņemts no groza."
+        invalid_token: "Šī forma novēlojusies. Mēģini vēlreiz."
+        out_of_stock: "Noliktavā nepietiek šīs preces."
+        empty: "Tavs grozs ir tukšs."
+        payments_unavailable: "Kartes maksājumi pašlaik nav pieejami. Pasūti reģistratūrā."
+        checkout_failed: "Neizdevās uzsākt maksājumu. Nekas netika debetēts - mēģini vēlreiz."
+        checkout_cancelled: "Maksājums atcelts. Nekas netika debetēts."
+    success:
+        title: "Paldies"
+        lead: "Tavs pasūtījums %reference% ir saņemts."
+        pending: "Stripe vēl apstiprina maksājumu. Šī lapa un tavs konts atjaunināsies paši - tev nekas nav jādara."
+        paid: "Maksājums saņemts. Komplektējam tavu pasūtījumu."
+        unknown: "Neizdevās sasaistīt šo maksājumu ar pasūtījumu. Ja nauda tika norakstīta, sazinies ar mums un mēs to atrisināsim."
+    order:
+        reference: "Pasūtījums"
+        placed_at: "Veikts"
+        status: "Statuss"
+        total: "Summa"
+        items: "Preces"
+        state:
+            pending: "Gaida apmaksu"
+            paid: "Apmaksāts"
+            cancelled: "Atcelts"
+            expired: "Nokavēts"
+            fulfilled: "Nosūtīts"

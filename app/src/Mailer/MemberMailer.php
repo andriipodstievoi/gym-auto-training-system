@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mailer;
 
+use App\Entity\Order;
 use App\Entity\User;
 use App\Entity\UserMembership;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -43,6 +44,16 @@ final readonly class MemberMailer
             'email.membership.subject',
             'email/membership_confirmed.html.twig',
             ['membership' => $membership],
+        );
+    }
+
+    public function sendOrderConfirmation(Order $order): void
+    {
+        $this->send(
+            $order->getUser(),
+            'email.order.subject',
+            'email/order_confirmed.html.twig',
+            ['order' => $order],
         );
     }
 

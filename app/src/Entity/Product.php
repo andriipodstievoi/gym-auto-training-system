@@ -7,14 +7,17 @@ namespace App\Entity;
 use App\Doctrine\Type\TranslatedStringType;
 use App\Domain\TranslatedString;
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Something a member can buy: clothing, supplements, accessories.
  *
- * Variants (size, flavour) arrive with the cart in M4; for now a product is a
- * single sellable line so the catalogue and admin can be built against it.
+ * Variants (size, flavour) are optional: a shaker is one sellable line, a
+ * hoodie is four. Everything that prices a product therefore has to ask
+ * {@see hasVariants()} first rather than reading priceCents blind.
  */
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\Table(name: 'product')]
@@ -60,10 +63,18 @@ class Product
     #[ORM\Column]
     private bool $active = true;
 
+    /**
+     * @var Collection<int, ProductVariant>
+     */
+    #[ORM\OneToMany(targetEntity: ProductVariant::class, mappedBy: 'product', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private Collection $variants;
+
     public function __construct()
     {
         $this->name = new TranslatedString();
         $this->description = new TranslatedString();
+        $this->variants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -187,6 +198,78 @@ class Product
         $this->active = $active;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductVariant>
+     */
+    public function getVariants(): Collection
+    {
+        return $this->variants;
+    }
+
+    public function addVariant(ProductVariant $variant): static
+    {
+        if (!$this->variants->contains($variant)) {
+            $this->variants->add($variant);
+            $variant->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVariant(ProductVariant $variant): static
+    {
+        $this->variants->removeElement($variant);
+
+        return $this;
+    }
+
+    public function hasVariants(): bool
+    {
+        return !$this->variants->isEmpty();
+    }
+
+    /**
+     * The variants somebody can actually put in a basket.
+     *
+     * @return list<ProductVariant>
+     */
+    public function getAvailableVariants(): array
+    {
+        return array_values(array_filter(
+            $this->variants->toArray(),
+            static fn (ProductVariant $variant): bool => $variant->isActive() && $variant->getStock() > 0,
+        ));
+    }
+
+    /**
+     * The price to advertise on a listing: the cheapest active variant, or the
+     * product's own price when it has none.
+     */
+    public function getPriceCentsFrom(): int
+    {
+        $prices = array_map(
+            static fn (ProductVariant $variant): int => $variant->getPriceCents(),
+            array_filter($this->variants->toArray(), static fn (ProductVariant $variant): bool => $variant->isActive()),
+        );
+
+        return [] === $prices ? $this->priceCents : min($prices);
+    }
+
+    /**
+     * How many units exist across the whole product, so a listing can say
+     * "out of stock" without opening every size.
+     */
+    public function getTotalStock(): int
+    {
+        $active = array_filter($this->variants->toArray(), static fn (ProductVariant $variant): bool => $variant->isActive());
+
+        if ([] === $active) {
+            return $this->stock;
+        }
+
+        return array_sum(array_map(static fn (ProductVariant $variant): int => $variant->getStock(), $active));
     }
 
     public function __toString(): string

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Payment;
 
+use App\Entity\Order;
 use App\Entity\UserMembership;
 use LogicException;
 use Stripe\Checkout\Session;
@@ -110,6 +111,58 @@ final class StripeCheckout
                     'product_data' => $productData,
                 ],
             ]],
+        ]);
+    }
+
+    /**
+     * Hands a pending shop order to Stripe, one line item per order line.
+     *
+     * The amounts come from the order's own snapshots, never from the cart or
+     * the request that built it: by the time this runs the prices have already
+     * been read from the database and written down.
+     *
+     * client_reference_id is prefixed so a glance at the Stripe dashboard says
+     * which of the two things this app sells a payment was for; the webhook
+     * reads metadata.order_id.
+     *
+     * @throws ApiErrorException     when Stripe rejects the request
+     * @throws PaymentsNotConfigured when no secret key is set
+     * @throws LogicException        when the order was never persisted
+     */
+    public function createOrderSession(
+        Order $order,
+        string $successUrl,
+        string $cancelUrl,
+        string $locale,
+    ): Session {
+        $orderId = $order->getId();
+
+        if (null === $orderId) {
+            throw new LogicException('Persist the order before sending it to Stripe; the webhook needs its id to find it again.');
+        }
+
+        $lineItems = [];
+
+        foreach ($order->getItems() as $item) {
+            $lineItems[] = [
+                'quantity' => $item->getQuantity(),
+                'price_data' => [
+                    'currency' => 'eur',
+                    'unit_amount' => $item->getUnitPriceCents(),
+                    'product_data' => ['name' => $item->getNameSnapshot()->get($locale)],
+                ],
+            ];
+        }
+
+        return $this->client()->checkout->sessions->create([
+            'mode' => 'payment',
+            'locale' => in_array($locale, self::SUPPORTED_LOCALES, true) ? $locale : 'auto',
+            'customer_email' => $order->getEmail(),
+            'client_reference_id' => 'order_'.$orderId,
+            'metadata' => ['order_id' => (string) $orderId],
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'line_items' => $lineItems,
         ]);
     }
 

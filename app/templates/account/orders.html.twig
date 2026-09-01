@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% set locale = app.request.locale %}
+
+{% block title %}{{ 'account.orders.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'account.orders.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-4xl px-4 py-14">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-signal-500">{{ 'account.kicker'|trans }}</p>
+        <h1 class="mt-3 text-4xl font-black text-white">{{ 'account.orders.title'|trans }}</h1>
+
+        {% include 'account/_nav.html.twig' %}
+
+        <div class="mt-8">
+            {% include 'partials/_flashes.html.twig' %}
+        </div>
+
+        <p class="text-iron-200">{{ 'account.orders.lead'|trans }}</p>
+
+        {% if orders|length > 0 %}
+            <div class="mt-6 overflow-x-auto rounded-xl border border-iron-800">
+                <table class="w-full min-w-[36rem] text-left text-sm">
+                    <caption class="sr-only">{{ 'account.orders.title'|trans }}</caption>
+                    <thead class="bg-iron-800/60 text-xs uppercase tracking-wide text-iron-400">
+                        <tr>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.order.reference'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.order.placed_at'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.order.status'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.order.total'|trans }}</th>
+                            <th scope="col" class="px-5 py-3 font-semibold">{{ 'shop.order.items'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-iron-800 text-iron-200">
+                        {% for order in orders %}
+                            <tr>
+                                <td class="px-5 py-3 font-medium text-white">{{ order.reference }}</td>
+                                <td class="px-5 py-3">{{ order.createdAt|format_date('medium') }}</td>
+                                <td class="px-5 py-3">{{ ('shop.order.state.' ~ order.status.value)|trans }}</td>
+                                <td class="px-5 py-3 font-semibold text-white">{{ (order.totalCents / 100)|format_currency('EUR') }}</td>
+                                <td class="px-5 py-3">
+                                    <ul>
+                                        {% for item in order.items %}
+                                            <li>{{ item.quantity }} × {{ item.nameSnapshot.get(locale) }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="mt-6 rounded-xl border border-iron-800 bg-iron-800/40 p-7">
+                <p class="text-iron-200">{{ 'account.orders.empty'|trans }}</p>
+                <a href="{{ path('shop_index') }}"
+                   class="mt-5 inline-block rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
+                    {{ 'account.orders.view'|trans }}
+                </a>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

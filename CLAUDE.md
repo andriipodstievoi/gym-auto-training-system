@@ -162,6 +162,16 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 - Anything that renders a **password field wants a username field beside it**, even a hidden one,
   or Chrome logs a console warning. Name it outside the form type's namespace so the form does
   not see it as an extra field.
+- `order` is a **reserved word in MySQL** too, like `interval` and `lines` - the orders table is
+  `customer_order` and the lines are `customer_order_item`.
+- A **pluralised message rendered with a bare `|trans` emits the raw string**, pipes and all
+  (`{0}empty|{1}1 item|]1,Inf[ %count% items`). Symfony only selects a plural when `%count%` is
+  in the parameters, so write `|trans({'%count%': n})`. Nothing fails - it renders on the page.
+- EasyAdmin 5 wants **`#[AdminRoute]` on any custom CRUD action**, or the index page 500s when it
+  tries to generate the URL. Test admin pages by requesting them, not by constructing controllers.
+- **Disabling an EasyAdmin action is not the same as removing it.** `remove()` only hides the
+  button and leaves `/admin/<entity>/new` working; `disable()` makes it 403. Orders use `disable()`
+  so no one can hand-write a paid order.
 
 ## Status
 
@@ -171,8 +181,8 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 | M1 | Domain model, migrations, fixtures, back office | done |
 | M2 | Public site, Leaflet branch map, SVG floor plan | done |
 | M3 | Accounts, memberships, Stripe test checkout | done |
-| M4 | Shop — catalogue, cart, orders | **next** |
-| M5 | Trainers, availability, booking, messaging | planned |
+| M4 | Shop — catalogue, cart, orders | done |
+| M5 | Trainers, availability, booking, messaging | **next** |
 | M6 | Assessment, rule engine, LLM layer, PDF export | planned |
 | M7 | Coverage, docs, screenshots | planned |
 
@@ -216,3 +226,23 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   a live-key run is Andrii's alone.
 - Fixtures seed `admin@speks.lv`, `member@speks.lv` and `prospect@speks.lv`, all with
   password `speks-dev`.
+
+### The shop (M4)
+
+- **`Order` snapshots what was bought.** Name, SKU and unit price are copied onto the line, and
+  the product and variant references are nullable `ON DELETE SET NULL`. Repricing or deleting a
+  product must never rewrite what somebody was charged - the same reason `UserMembership` copies
+  its price in.
+- **The cart stores ids and quantities in the session, never prices.** Every render re-reads the
+  catalogue, so a stale session cannot underpay; lines whose product has since been deactivated
+  drop out silently and quantities clamp to stock.
+- **Only the Stripe webhook may mark an order PAID**, exactly as with memberships. One endpoint
+  now serves both, and which one a session belongs to is decided by its `order_id` metadata -
+  never guessed from the amount.
+- **Stock is drawn down on payment, not at checkout**, so an abandoned checkout does not hold
+  stock hostage. It is floored at zero: two people can pay for the last item in the same second,
+  and refusing money Stripe has already taken would be worse than overselling one unit.
+- **`ProductVariant` is optional.** A product with no variants sells on its own price and stock;
+  one with variants sells only through them. Both paths are seeded so both stay tested.
+- Cart mutations carry their own CSRF token id (`cart`), separate from `checkout`. Adding to a
+  basket is not handing money to Stripe and the two should not share a token.

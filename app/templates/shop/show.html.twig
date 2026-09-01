@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% set locale = app.request.locale %}
+{% set available = product.availableVariants %}
+{% set buyable = product.hasVariants ? available|length > 0 : product.stock > 0 %}
+
+{#
+   Alpine holds the picked variant so the price and the stock line follow the
+   select without a round trip. The map is keyed by variant id as a string,
+   because that is what a select's value is.
+#}
+{% set variant_data = {} %}
+{% for variant in available %}
+    {% set variant_data = variant_data|merge({(variant.id ~ ''): {
+        price: (variant.priceCents / 100)|format_currency('EUR'),
+        stock: variant.stock,
+    }}) %}
+{% endfor %}
+
+{% block title %}{{ product.name.get(locale) }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ product.description and not product.description.isEmpty ? product.description.get(locale) : 'shop.index.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-4xl px-4 pt-14 pb-16">
+        <a href="{{ product.category ? path('shop_category', {slug: product.category.slug}) : path('shop_index') }}"
+           class="text-sm font-semibold text-signal-500 hover:text-signal-400">
+            &larr; {{ 'shop.product.back'|trans }}
+        </a>
+
+        <div class="mt-6">
+            {% include 'partials/_flashes.html.twig' %}
+        </div>
+
+        <div class="mt-4 grid gap-8 md:grid-cols-2">
+            <div>
+                {% if product.imagePath %}
+                    <img src="{{ asset(product.imagePath) }}" alt="{{ product.name.get(locale) }}"
+                         class="w-full rounded-xl border border-iron-800 object-cover">
+                {% else %}
+                    <div class="flex aspect-square items-center justify-center rounded-xl border border-iron-800 bg-iron-800/40">
+                        <span aria-hidden="true" class="text-6xl">🏋️</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div x-data="{ variant: '{{ available|length > 0 ? (available|first).id : '' }}', variants: {{ variant_data|json_encode }}, quantity: 1 }">
+                <h1 class="text-3xl font-black leading-tight text-white">{{ product.name.get(locale) }}</h1>
+
+                <p class="mt-2 text-xs uppercase tracking-wide text-iron-400">
+                    {{ 'shop.product.sku'|trans }}: {{ product.sku }}
+                </p>
+
+                {% if product.description and not product.description.isEmpty %}
+                    <p class="mt-4 text-sm leading-relaxed text-iron-200">{{ product.description.get(locale) }}</p>
+                {% endif %}
+
+                <p class="mt-6 text-3xl font-black text-white">
+                    {% if product.hasVariants %}
+                        <span x-text="variants[variant] ? variants[variant].price : '{{ (product.priceCentsFrom / 100)|format_currency('EUR') }}'">{{ (product.priceCentsFrom / 100)|format_currency('EUR') }}</span>
+                    {% else %}
+                        {{ (product.priceCents / 100)|format_currency('EUR') }}
+                    {% endif %}
+                </p>
+
+                {% if buyable %}
+                    <form method="post" action="{{ path('cart_add') }}" class="mt-6 space-y-4">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                        <input type="hidden" name="slug" value="{{ product.slug }}">
+
+                        {% if product.hasVariants %}
+                            <div>
+                                <p class="text-sm text-iron-300">{{ 'shop.product.choose_variant'|trans }}</p>
+                                <label for="variant" class="mt-2 block text-xs font-semibold uppercase tracking-wide text-iron-400">
+                                    {{ 'shop.product.variant_label'|trans }}
+                                </label>
+                                <select id="variant" name="variant" x-model="variant"
+                                        class="mt-2 w-full rounded-lg border border-iron-700 bg-iron-900 px-3 py-2.5 text-white">
+                                    {% for variant in available %}
+                                        <option value="{{ variant.id }}">{{ variant.label.get(locale) }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+
+                        <div>
+                            <label for="quantity" class="block text-xs font-semibold uppercase tracking-wide text-iron-400">
+                                {{ 'shop.product.quantity'|trans }}
+                            </label>
+                            <input id="quantity" name="quantity" type="number" inputmode="numeric"
+                                   min="1" max="{{ cart_max_quantity() }}" value="1" x-model="quantity"
+                                   class="mt-2 w-28 rounded-lg border border-iron-700 bg-iron-900 px-3 py-2.5 text-white">
+                        </div>
+
+                        <p class="text-xs font-semibold uppercase tracking-wide text-signal-500">
+                            {{ 'shop.product.in_stock'|trans }}{% if product.hasVariants %}<span x-text="variants[variant] ? ' (' + variants[variant].stock + ')' : ''"></span>{% endif %}
+                        </p>
+
+                        <button type="submit"
+                                class="w-full rounded-lg bg-signal-500 px-4 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
+                            {{ 'shop.product.add_to_cart'|trans }}
+                        </button>
+                    </form>
+                {% else %}
+                    <p class="mt-6 rounded-lg border border-iron-700 px-4 py-2.5 text-center text-sm text-iron-400">
+                        {{ 'shop.product.unavailable'|trans }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

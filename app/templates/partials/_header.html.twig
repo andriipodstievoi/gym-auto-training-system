@@ -7,8 +7,9 @@
     { key: 'map', route: 'branch_index', prefix: 'branch_' },
     { key: 'memberships', route: 'membership_index', prefix: 'membership_' },
     { key: 'trainers', route: 'trainer_index', prefix: 'trainer_' },
+    { key: 'shop', route: 'shop_index', prefix: 'shop_' },
 ] %}
-{% set pending = ['shop'] %}
+{% set pending = [] %}
 {% set current = app.request.attributes.get('_route') %}
 
 <header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-iron-800 bg-iron-900/90 backdrop-blur">
@@ -30,6 +31,18 @@
                 <span class="cursor-not-allowed text-iron-400" title="{{ 'nav.soon'|trans }}">{{ ('nav.' ~ key)|trans }}</span>
             {% endfor %}
             <span class="cursor-not-allowed rounded-md bg-signal-500 px-4 py-2 font-semibold text-iron-900" title="{{ 'nav.soon'|trans }}">{{ 'nav.quiz'|trans }}</span>
+
+            {#
+               The badge sits outside the link's text so it is not compared
+               against the accessible name; the count is spoken through the
+               label instead.
+            #}
+            {% set cart_items = cart_count() %}
+            <a href="{{ path('cart_show') }}"
+               class="{{ current starts with 'cart_' ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
+               aria-label="{{ 'nav.cart'|trans }}{% if cart_items > 0 %} ({{ cart_items }}){% endif %}">
+                <span aria-hidden="true">{{ 'nav.cart'|trans }}{% if cart_items > 0 %} <span class="ml-1 rounded-full bg-signal-500 px-2 py-0.5 text-xs font-bold text-iron-900">{{ cart_items }}</span>{% endif %}</span>
+            </a>
 
             {% if app.user %}
                 {% set on_account = current starts with 'app_account' %}
@@ -60,6 +73,10 @@
             {% for key in pending|merge(['quiz']) %}
                 <span class="text-iron-400">{{ ('nav.' ~ key)|trans }}</span>
             {% endfor %}
+            <a href="{{ path('cart_show') }}" class="text-iron-100 hover:text-signal-500"
+               aria-label="{{ 'nav.cart'|trans }}{% if cart_count() > 0 %} ({{ cart_count() }}){% endif %}">
+                <span aria-hidden="true">{{ 'nav.cart'|trans }}{% if cart_count() > 0 %} ({{ cart_count() }}){% endif %}</span>
+            </a>
 
             {% if app.user %}
                 <a href="{{ path('app_account') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.account'|trans }}</a>
