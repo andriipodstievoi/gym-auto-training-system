@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+{% import 'partials/_form_field.html.twig' as fields %}
+{% import 'partials/_choice_group.html.twig' as groups %}
+
+{#
+   The questionnaire is one form and one POST, always.
+
+   Alpine reveals it a step at a time, which is the only reason the step
+   sections exist - with JavaScript off, [x-cloak] reverts (see base.html.twig)
+   and every step is simply on the page at once. Nothing here is a wizard of
+   several requests, so no answer can be lost between them.
+
+   The controls Alpine drives are the other way round: they start with Tailwind's
+   "hidden" and Alpine removes it on init, so a browser that never runs Alpine
+   is not shown a step button that cannot do anything.
+#}
+
+{% block title %}{{ 'assessment.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'assessment.lead'|trans }}{% endblock %}
+
+{% block body %}
+    {% set steps = ['profile', 'goal', 'schedule', 'equipment', 'health'] %}
+
+    {#
+       Which step to open on. Coming back from a rejected submission on step one
+       while the mistake is on step three would read as the site losing the
+       answer, so the first step that has an error wins.
+    #}
+    {% set step_errors = [
+        form.age.vars.errors|length + form.heightCm.vars.errors|length + form.weightKg.vars.errors|length,
+        form.goal.vars.errors|length + form.experience.vars.errors|length,
+        form.daysPerWeek.vars.errors|length + form.minutesPerSession.vars.errors|length,
+        form.equipment.vars.errors|length + form.limitations.vars.errors|length + form.dislikedExercises.vars.errors|length,
+        0,
+    ] %}
+    {% set failing = step_errors|filter(count => count > 0)|keys|first %}
+    {% set open_step = failing is null ? 1 : failing + 1 %}
+
+    <section class="mx-auto max-w-3xl px-4 pt-10 pb-16">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-signal-500">{{ 'assessment.kicker'|trans }}</p>
+        <h1 class="mt-3 text-4xl font-black leading-tight text-white sm:text-5xl">{{ 'assessment.title'|trans }}</h1>
+        <p class="mt-4 text-lg text-iron-200">{{ 'assessment.lead'|trans }}</p>
+
+        <div class="mt-8">
+            {% include 'partials/_flashes.html.twig' %}
+        </div>
+
+        {{ form_start(form, {
+            action: path('assessment_submit'),
+            attr: { novalidate: 'novalidate', 'x-data': '{ step: ' ~ open_step ~ ' }' },
+        }) }}
+            <input type="hidden" name="_token" value="{{ csrf_token('assessment') }}">
+
+            {# Alpine only: without it every step is on the page anyway. #}
+            <nav class="hidden flex-wrap gap-2 border-b border-iron-800 pb-4"
+                 x-init="$el.classList.remove('hidden'); $el.classList.add('flex')"
+                 aria-label="{{ 'assessment.title'|trans }}">
+                {% for index, key in steps %}
+                    <button type="button" @click="step = {{ index + 1 }}"
+                            :aria-current="step === {{ index + 1 }} ? 'step' : false"
+                            :class="step === {{ index + 1 }} ? 'border-signal-500 text-signal-500' : 'border-iron-700 text-iron-400 hover:text-white'"
+                            class="rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide">
+                        {{ index + 1 }}. {{ ('assessment.step.' ~ key)|trans }}
+                    </button>
+                {% endfor %}
+            </nav>
+
+            {# ---- 1. About you ------------------------------------------ #}
+            <section x-show="step === 1" class="mt-8">
+                <h2 class="text-xl font-bold text-white">{{ 'assessment.step.profile'|trans }}</h2>
+
+                <div class="mt-5 grid gap-5 sm:grid-cols-3">
+                    {{ fields.field(form.age) }}
+                    {{ fields.field(form.heightCm) }}
+                    {{ fields.field(form.weightKg) }}
+                </div>
+            </section>
+
+            {# ---- 2. What you are training for --------------------------- #}
+            <section x-show="step === 2" x-cloak class="mt-8">
+                <h2 class="text-xl font-bold text-white">{{ 'assessment.step.goal'|trans }}</h2>
+
+                <div class="mt-5 space-y-6">
+                    {{ groups.group(form.goal) }}
+                    {{ groups.group(form.experience) }}
+                </div>
+            </section>
+
+            {# ---- 3. Your week ------------------------------------------- #}
+            <section x-show="step === 3" x-cloak class="mt-8">
+                <h2 class="text-xl font-bold text-white">{{ 'assessment.step.schedule'|trans }}</h2>
+
+                <div class="mt-5 space-y-6">
+                    {{ groups.group(form.daysPerWeek) }}
+                    {{ groups.group(form.minutesPerSession) }}
+                </div>
+            </section>
+
+            {# ---- 4. What you train with --------------------------------- #}
+            <section x-show="step === 4" x-cloak class="mt-8">
+                <h2 class="text-xl font-bold text-white">{{ 'assessment.step.equipment'|trans }}</h2>
+
+                <div class="mt-5 space-y-6">
+                    {{ groups.group(form.equipment) }}
+                    {{ groups.group(form.limitations, { optional: true }) }}
+                    {{ fields.field(form.dislikedExercises) }}
+                </div>
+            </section>
+
+            {# ---- 5. Health screening ------------------------------------ #}
+            <section x-show="step === 5" x-cloak class="mt-8">
+                <h2 class="text-xl font-bold text-white">{{ 'assessment.step.health'|trans }}</h2>
+
+                <fieldset class="mt-5">
+                    <legend class="text-lg font-semibold text-white">{{ 'assessment.parq.title'|trans }}</legend>
+                    <p class="mt-2 text-sm text-iron-400">{{ 'assessment.parq.lead'|trans }}</p>
+
+                    <div class="mt-5 space-y-3">
+                        {#
+                           Named from the entity's own list, so the eight
+                           questions, their POST keys and their translation keys
+                           cannot drift apart.
+                        #}
+                        {% for name in constant('App\\Entity\\Assessment::PAR_Q_FIELDS') %}
+                            {% set question = attribute(form, name) %}
+                            <div class="flex items-start gap-3 rounded-lg border border-iron-800 bg-iron-800/40 px-4 py-3">
+                                {{ form_widget(question, {
+                                    attr: { class: 'mt-0.5 size-5 shrink-0 rounded border-iron-600 bg-iron-900 text-signal-500 focus:ring-signal-500' },
+                                }) }}
+                                <label for="{{ question.vars.id }}" class="text-sm leading-relaxed text-iron-100">
+                                    {{ question.vars.label|trans }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+            </section>
+
+            {#
+               Alpine only, for the same reason as the step nav above. Each
+               button is labelled with the step it opens rather than with a
+               bare "next", so it needs no wording of its own.
+            #}
+            <div class="mt-8 hidden" x-init="$el.classList.remove('hidden')">
+                {% for index in 0..(steps|length - 2) %}
+                    <button type="button" x-show="step === {{ index + 1 }}" @click="step = {{ index + 2 }}"
+                            class="rounded-lg border border-iron-600 px-5 py-2.5 font-semibold text-white hover:border-signal-500 hover:text-signal-500">
+                        {{ ('assessment.step.' ~ steps[index + 1])|trans }} &rarr;
+                    </button>
+                {% endfor %}
+            </div>
+
+            <button type="submit"
+                    class="mt-8 w-full rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400 sm:w-auto">
+                {{ 'assessment.submit'|trans }}
+            </button>
+        {{ form_end(form) }}
+
+        <p class="mt-8 border-t border-iron-800 pt-6 text-xs leading-relaxed text-iron-400">
+            {{ 'plan.disclaimer'|trans }}
+        </p>
+    </section>
+{% endblock %}

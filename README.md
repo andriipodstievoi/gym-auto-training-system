@@ -63,7 +63,7 @@ loads. The site produces valid programmes with no API key configured.
 | **M3** | Accounts, memberships, Stripe test checkout | ✅ done |
 | **M4** | Shop — catalogue, cart, orders | ✅ done |
 | **M5** | Trainers, availability, booking, messaging | ✅ done |
-| M6 | Assessment, rule engine, LLM layer, PDF export | planned |
+| **M6** | Assessment, rule engine, LLM layer, PDF export | ✅ done |
 | M7 | Coverage, docs, screenshots | planned |
 
 ---
@@ -173,7 +173,13 @@ stripe listen --forward-to http://127.0.0.1:8000/webhook/stripe
 ```
 
 The plan service reads `AI_ANTHROPIC_API_KEY` from its own environment. Leave it
-unset and plans still generate — only the coaching narrative is skipped.
+unset and plans still generate — only the coaching narrative is skipped, and
+`llm_used` says so.
+
+**Running with the plan service stopped is also a supported state.** The
+assessment page says the generator is not answering and keeps the member's
+answers on the form, rather than returning a 500. That is how CI runs the
+suite — nothing listens on port 8001 there.
 
 ---
 

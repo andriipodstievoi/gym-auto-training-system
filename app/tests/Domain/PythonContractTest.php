@@ -8,6 +8,7 @@ use App\Domain\Enum\Equipment;
 use App\Domain\Enum\Experience;
 use App\Domain\Enum\Goal;
 use App\Domain\Enum\Limitation;
+use App\Domain\Enum\PlanStatus;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -41,6 +42,7 @@ final class PythonContractTest extends TestCase
         yield 'Experience' => ['Experience', array_map(static fn (Experience $c): string => $c->value, Experience::cases())];
         yield 'Equipment' => ['Equipment', array_map(static fn (Equipment $c): string => $c->value, Equipment::cases())];
         yield 'Limitation' => ['Limitation', array_map(static fn (Limitation $c): string => $c->value, Limitation::cases())];
+        yield 'PlanStatus' => ['PlanStatus', array_map(static fn (PlanStatus $c): string => $c->value, PlanStatus::cases())];
     }
 
     /**

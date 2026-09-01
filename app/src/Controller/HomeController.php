@@ -46,7 +46,7 @@ final class HomeController extends AbstractController
             'detail' => 'Catalogue, variants, cart, orders and order history for clothing and supplements.'],
         ['id' => 'M5', 'title' => 'Trainers & booking', 'done' => true,
             'detail' => 'Coach profiles, availability, session booking and messaging with email notifications.'],
-        ['id' => 'M6', 'title' => 'Automatic training system', 'done' => false,
+        ['id' => 'M6', 'title' => 'Automatic training system', 'done' => true,
             'detail' => 'The assessment, the Python rule engine, the LLM coaching layer and PDF plan export.'],
         ['id' => 'M7', 'title' => 'Hardening', 'done' => false,
             'detail' => 'PHPUnit and pytest coverage, PHPStan level up, documentation and screenshots.'],

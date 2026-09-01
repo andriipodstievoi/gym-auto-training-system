@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{#
+   The screening gate's answer.
+
+   It is stored and shown like a programme, and it is written like one too: the
+   member answered a health questionnaire honestly and is owed a clear next
+   step, not a page that reads as though the site turned them away.
+#}
+
+{% block title %}{{ 'plan.referral.title'|trans }} · {{ 'brand.name'|trans }}{% endblock %}
+{% block description %}{{ 'plan.referral.lead'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="mx-auto max-w-3xl px-4 pt-10 pb-16">
+        {# Not plan.kicker: "Your programme" over "Please see a doctor first"
+           reads as a programme that was taken away. #}
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-signal-500">{{ 'assessment.kicker'|trans }}</p>
+        <h1 class="mt-3 text-4xl font-black leading-tight text-white sm:text-5xl">{{ 'plan.referral.title'|trans }}</h1>
+        <p class="mt-4 text-lg text-iron-200">{{ 'plan.referral.lead'|trans }}</p>
+
+        <div class="mt-8">
+            {% include 'partials/_flashes.html.twig' %}
+        </div>
+
+        <div class="rounded-xl border border-signal-500/40 bg-signal-500/10 p-7">
+            <p class="leading-relaxed text-signal-500">{{ 'plan.referral.body'|trans }}</p>
+        </div>
+
+        {% if plan.redFlags|length > 0 %}
+            <section class="mt-8 rounded-xl border border-iron-800 bg-iron-800/40 p-7">
+                <h2 class="text-lg font-bold text-white">{{ 'plan.referral.flags'|trans }}</h2>
+
+                <ul class="mt-4 space-y-3 text-iron-200">
+                    {#
+                       Named by the contract, which is also how the questionnaire
+                       named them - so a member reads back the same sentence they
+                       ticked rather than a field name.
+                    #}
+                    {% for flag in plan.redFlags %}
+                        <li class="flex gap-3">
+                            <span aria-hidden="true" class="text-signal-500">&bull;</span>
+                            <span>{{ ('assessment.parq.' ~ flag)|trans }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+
+        <div class="mt-8 flex flex-wrap gap-3">
+            <a href="{{ path('trainer_index') }}"
+               class="rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
+                {{ 'plan.referral.contact'|trans }}
+            </a>
+            <a href="{{ path('assessment_start') }}"
+               class="rounded-lg border border-iron-600 px-5 py-2.5 font-semibold text-iron-100 hover:border-signal-500 hover:text-signal-500">
+                {{ 'plan.regenerate'|trans }}
+            </a>
+        </div>
+
+        <p class="mt-10 text-sm leading-relaxed text-iron-400">
+            {{ 'plan.disclaimer'|trans }}
+        </p>
+    </section>
+{% endblock %}

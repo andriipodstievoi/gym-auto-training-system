@@ -1,0 +1,50 @@
+{#
+   One expanded choice field: a fieldset, a legend that names the question, and
+   an individually labelled control per option.
+
+   Separate from the single-control macro in _form_field.html.twig because a
+   group is not a field. form_label() on a radio or checkbox group points at the
+   wrapper rather than at any control, which is the same defect Symfony's
+   TimeType has and which Lighthouse reports as a control with no label - so the
+   group gets a <legend> and each option gets its own <label for>.
+
+   The input itself is visually hidden behind its label rather than left beside
+   it, so the option can be styled as a chip without any control losing its
+   accessible name.
+#}
+{% macro group(field, options = {}) %}
+    {% set has_errors = field.vars.errors|length > 0 %}
+    {% set help_id = field.vars.id ~ '_help' %}
+    {% set error_id = field.vars.id ~ '_error' %}
+
+    <fieldset>
+        <legend class="text-sm font-medium text-iron-200">
+            {{ field.vars.label|trans }}
+            {% if options.optional|default(false) %}
+                <span class="ml-2 text-xs font-normal uppercase tracking-wide text-iron-400">{{ 'assessment.optional'|trans }}</span>
+            {% endif %}
+        </legend>
+
+        {% if field.vars.help is not empty %}
+            <p id="{{ help_id }}" class="mt-1.5 text-xs text-iron-400">{{ field.vars.help|trans }}</p>
+        {% endif %}
+
+        <div class="mt-3 flex flex-wrap gap-2">
+            {% for choice in field %}
+                <div>
+                    {{ form_widget(choice, { attr: { class: 'peer sr-only' } }) }}
+                    <label for="{{ choice.vars.id }}"
+                           class="block cursor-pointer rounded-lg border border-iron-700 px-4 py-2 text-sm text-iron-100 hover:border-signal-500 peer-checked:border-signal-500 peer-checked:bg-signal-500 peer-checked:font-semibold peer-checked:text-iron-900 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-signal-400">
+                        {{ choice.vars.translation_domain is same as(false) ? choice.vars.label : choice.vars.label|trans }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if has_errors %}
+            <p id="{{ error_id }}" class="mt-2 text-xs text-red-300">
+                {% for error in field.vars.errors %}{{ error.message }}{% if not loop.last %} {% endif %}{% endfor %}
+            </p>
+        {% endif %}
+    </fieldset>
+{% endmacro %}

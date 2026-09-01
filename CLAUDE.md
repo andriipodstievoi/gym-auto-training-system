@@ -187,6 +187,25 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   the member's "we passed it on" shared a subject line at first, which made a member's inbox read
   as though somebody wanted an hour from *them*.
 
+- **A docblock cannot fail a build.** Four enums mirror `ai-service/app/schemas.py`, and each one
+  asked the next person to keep them in step. `tests/Domain/PythonContractTest.php` reads the
+  Pydantic file as text and asserts it, so a drift committed by somebody who never ran the Python
+  service still fails. `TranslationParityTest` does the same for the three catalogues.
+- **A missing translation key fails nothing at runtime** - Symfony falls back, and if the fallback
+  misses too, the raw dotted key renders on the page. Only somebody browsing in Latvian or Russian
+  ever sees it, which is nobody on the team. Hence the parity test.
+- **Unescaped double quotes inside a double-quoted YAML scalar** break the whole catalogue.
+  `bin/console lint:yaml translations` catches it; run it after every translation edit.
+- reportlab's default Helvetica **cannot draw Cyrillic** - it silently emits nothing rather than
+  failing. DejaVu is vendored in `ai-service/app/fonts/`, and the tests extract text back out of a
+  generated PDF rather than concluding from the absence of an exception.
+
+- **A test that passes only because something is not running is not a passing test.** The
+  plan-service-down tests originally relied on nothing listening on port 8001. That is true in CI
+  and false for anyone running the whole stack, so the suite went red on a developer machine and
+  green on the server. Inject a `MockHttpClient` that refuses the connection instead; the suite now
+  gives the same result with the service up or down, and both are checked.
+
 
 ## Status
 
@@ -198,8 +217,8 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 | M3 | Accounts, memberships, Stripe test checkout | done |
 | M4 | Shop — catalogue, cart, orders | done |
 | M5 | Trainers, availability, booking, messaging | done |
-| M6 | Assessment, rule engine, LLM layer, PDF export | **next** |
-| M7 | Coverage, docs, screenshots | planned |
+| M6 | Assessment, rule engine, LLM layer, PDF export | done |
+| M7 | Coverage, docs, screenshots | **next** |
 
 ### Decisions already made
 
@@ -241,6 +260,30 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   a live-key run is Andrii's alone.
 - Fixtures seed `admin@speks.lv`, `member@speks.lv` and `prospect@speks.lv`, all with
   password `speks-dev`.
+
+### The training-plan generator (M6)
+
+- **The rule engine computes every number.** Split, weekly set volume, rep ranges, RIR and the
+  mesocycle all come out of `ai-service/app/engine`. The LLM layer writes prose and nothing else,
+  and that is enforced by the types: `PlanProse` holds a string and a map of strings, parses with
+  `extra="ignore"`, and `apply_prose` is the only writer of model output. The model is never asked
+  for a plan, so there is nothing to trust and then verify.
+- **Plans generate with no API key.** `llm_used` reports the truth and the coaching notes fall back
+  to a deterministic localized string. This is how CI and a fresh clone run, and it is tested.
+- **`training_plan.payload` stores the whole document the service returned.** The engine owns that
+  shape and versions it in `engine_version`; normalising it into tables here would mean a schema
+  migration every time the engine learned a field, and would make this side the authority on a
+  structure it does not decide.
+- **The PAR-Q+ gate runs on both sides.** Symfony refuses to call the service at all when an
+  assessment carries a red flag - the service would refuse anyway, and not making the call is the
+  point. The eight answers are columns rather than a JSON blob: they are a fixed, safety-critical
+  set, so a missing one should be a schema error.
+- **The plan service being down is a supported state**, exactly like empty Stripe keys. Every
+  transport failure leaves `PlanService` as one `PlanServiceUnavailable`; the controller flashes it
+  and keeps the member's answers on the form, so "nothing was lost" is true rather than reassuring.
+  Nothing is listening on port 8001 in CI, so that is the path the whole suite runs.
+- Times, money and enums aside, this is the one feature where **the two runtimes have to agree**.
+  See ADR 0001, and the contract test that enforces it.
 
 ### Trainers and booking (M5)
 

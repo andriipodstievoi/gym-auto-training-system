@@ -1,7 +1,8 @@
 {#
-   Nav entries split in two: pages that exist, and pages a later milestone
-   still owes. The pending ones stay visible so the shape of the site is
-   honest rather than growing an item at a time.
+   Every entry here now points at a page that exists. The "pending" list this
+   nav used to carry - items a later milestone still owed, shown greyed out so
+   the shape of the site stayed honest - emptied when the assessment landed,
+   and an empty loop is not worth keeping.
 #}
 {% set links = [
     { key: 'map', route: 'branch_index', prefix: 'branch_' },
@@ -9,7 +10,6 @@
     { key: 'trainers', route: 'trainer_index', prefix: 'trainer_' },
     { key: 'shop', route: 'shop_index', prefix: 'shop_' },
 ] %}
-{% set pending = [] %}
 {% set current = app.request.attributes.get('_route') %}
 
 <header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-iron-800 bg-iron-900/90 backdrop-blur">
@@ -27,10 +27,9 @@
                     {{ ('nav.' ~ link.key)|trans }}
                 </a>
             {% endfor %}
-            {% for key in pending %}
-                <span class="cursor-not-allowed text-iron-400" title="{{ 'nav.soon'|trans }}">{{ ('nav.' ~ key)|trans }}</span>
-            {% endfor %}
-            <span class="cursor-not-allowed rounded-md bg-signal-500 px-4 py-2 font-semibold text-iron-900" title="{{ 'nav.soon'|trans }}">{{ 'nav.quiz'|trans }}</span>
+            <a href="{{ path('assessment_start') }}"
+               class="rounded-md bg-signal-500 px-4 py-2 font-semibold text-iron-900 hover:bg-signal-400"
+               {{ current starts with 'assessment_' ? 'aria-current="page"' : '' }}>{{ 'nav.quiz'|trans }}</a>
 
             {#
                The badge sits outside the link's text so it is not compared
@@ -64,7 +63,14 @@
                        {{ current starts with 'coach_' ? 'aria-current="page"' : '' }}>{{ 'coach.nav.label'|trans }}</a>
                 {% endif %}
 
-                {% set on_account = current starts with 'app_account' %}
+                {# The programme lives under the account, so the two share a
+                   prefix; only one of them should read as the current page. #}
+                {% set on_plans = current starts with 'plan_' or current == 'app_account_plans' %}
+                <a href="{{ path('app_account_plans') }}"
+                   class="{{ on_plans ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
+                   {{ on_plans ? 'aria-current="page"' : '' }}>{{ 'nav.plan'|trans }}</a>
+
+                {% set on_account = current starts with 'app_account' and not on_plans %}
                 <a href="{{ path('app_account') }}"
                    class="{{ on_account ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
                    {{ on_account ? 'aria-current="page"' : '' }}>{{ 'nav.account'|trans }}</a>
@@ -89,9 +95,7 @@
             {% for link in links %}
                 <a href="{{ path(link.route) }}" class="text-iron-100 hover:text-signal-500">{{ ('nav.' ~ link.key)|trans }}</a>
             {% endfor %}
-            {% for key in pending|merge(['quiz']) %}
-                <span class="text-iron-400">{{ ('nav.' ~ key)|trans }}</span>
-            {% endfor %}
+            <a href="{{ path('assessment_start') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.quiz'|trans }}</a>
             <a href="{{ path('cart_show') }}" class="text-iron-100 hover:text-signal-500"
                aria-label="{{ 'nav.cart'|trans }}{% if cart_count() > 0 %} ({{ cart_count() }}){% endif %}">
                 <span aria-hidden="true">{{ 'nav.cart'|trans }}{% if cart_count() > 0 %} ({{ cart_count() }}){% endif %}</span>
@@ -105,6 +109,7 @@
                 {% if is_coach() %}
                     <a href="{{ path('coach_dashboard') }}" class="text-iron-100 hover:text-signal-500">{{ 'coach.nav.label'|trans }}</a>
                 {% endif %}
+                <a href="{{ path('app_account_plans') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.plan'|trans }}</a>
                 <a href="{{ path('app_account') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.account'|trans }}</a>
                 <a href="{{ path('app_logout') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.logout'|trans }}</a>
             {% else %}
