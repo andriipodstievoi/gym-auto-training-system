@@ -10,7 +10,11 @@ services:
       - "8080:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../app:/var/www/app:ro
+      # The document root comes from the php image, not from the host. Mounting
+      # ../app here served whatever happened to be checked out instead of what
+      # was built - including no stylesheet, since AssetMapper compiles it into
+      # public/assets during the image build.
+      - app_public:/var/www/app/public:ro
     depends_on:
       php:
         condition: service_healthy
@@ -20,13 +24,28 @@ services:
       context: ..
       dockerfile: infra/php/Dockerfile
     environment:
-      APP_ENV: dev
+      # prod, matching the image. Running dev here would have re-enabled the
+      # profiler that --no-dev just removed the bundle for.
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      # Override for anything real. The value in app/.env is a development
+      # default that has been committed to a public repository since M3, so it
+      # must be treated as public knowledge.
+      APP_SECRET: "${APP_SECRET:-compose-development-secret-not-for-production}"
       DATABASE_URL: "mysql://gym:gym@mysql:3306/gym_app?serverVersion=8.4.3-mysql&charset=utf8mb4"
       REDIS_URL: "redis://redis:6379"
       MAILER_DSN: "smtp://mailpit:1025"
       AI_SERVICE_URL: "http://ai-service:8001"
+      # Empty is a supported state - the site boots and every page renders.
+      STRIPE_PUBLIC_KEY: "${STRIPE_PUBLIC_KEY:-}"
+      STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY:-}"
+      STRIPE_WEBHOOK_SECRET: "${STRIPE_WEBHOOK_SECRET:-}"
     volumes:
-      - ../app:/var/www/app
+      # Deliberately no bind mount of ../app. It shadowed the vendor directory
+      # the Dockerfile installs and the assets it compiles, so a fresh clone
+      # came up with neither. Only public/ is shared, and only so nginx can
+      # read it.
+      - app_public:/var/www/app/public
     depends_on:
       mysql:
         condition: service_healthy
@@ -77,3 +96,6 @@ services:
 
 volumes:
   db_data:
+  # Populated from the php image the first time it is created, which is how
+  # nginx gets the built stylesheet without a bind mount.
+  app_public:
