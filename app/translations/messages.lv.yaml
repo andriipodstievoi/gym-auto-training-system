@@ -558,3 +558,6 @@ plan:
         body: "Šis nav atteikums. Atnes atzinumu, un mūsu treneri visu izveidos ap tavu situāciju."
         flags: "Ko tu atzīmēji"
         contact: "Runāt ar treneri"
+
+a11y:
+    skip_to_content: "Pāriet uz saturu"

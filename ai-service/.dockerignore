@@ -1,0 +1,13 @@
+# The build context for this image is ai-service/, and .venv alone is 130 MB
+# of Windows-built packages the Linux image cannot use.
+
+.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
+
+# The image runs the service; it does not run the suite.
+tests
+
+.env
+.env.local
