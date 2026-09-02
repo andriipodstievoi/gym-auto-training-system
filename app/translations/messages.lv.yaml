@@ -338,7 +338,7 @@ shop:
         variant_label: "Variants"
         quantity: "Daudzums"
         add_to_cart: "Pievienot grozam"
-        from_price: "no %amount%"
+        from_price: "no"
         unavailable: "Nav pieejams"
     cart:
         title: "Tavs grozs"

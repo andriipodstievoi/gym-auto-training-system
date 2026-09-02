@@ -16,6 +16,9 @@
         <div class="grid gap-5 md:grid-cols-3">
             {% for plan in plans %}
                 <article class="flex flex-col rounded-xl border border-iron-800 bg-iron-800/40 p-7">
+                    <span class="mb-3 inline-flex self-start rounded-lg bg-iron-900/60 p-2.5 text-signal-500">
+                        {% include 'partials/_illustration.html.twig' with { name: 'membership', class: 'size-7' } %}
+                    </span>
                     <h2 class="text-xl font-bold text-white">{{ plan.name.get(locale) }}</h2>
 
                     <p class="mt-4 flex items-baseline gap-2">

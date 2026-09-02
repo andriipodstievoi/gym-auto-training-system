@@ -42,7 +42,9 @@
                       placeholder="{{ 'message.placeholder'|trans }}"
                       class="mt-2 w-full rounded-lg border border-iron-700 bg-iron-900 px-4 py-3 text-iron-100 focus:border-signal-500 focus:outline-none"></textarea>
 
-            <button type="submit" class="mt-4 rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+            <button type="submit"
+                    class="mt-4 inline-flex items-center gap-2 rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+                {% include 'partials/_icon.html.twig' with { name: 'send', class: 'size-5' } %}
                 {{ 'message.send'|trans }}
             </button>
         </form>

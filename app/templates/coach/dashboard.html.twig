@@ -43,15 +43,21 @@
                                     <form method="post" action="{{ path('coach_booking_respond', {id: booking.id}) }}">
                                         <input type="hidden" name="_token" value="{{ csrf_token('booking') }}">
                                         <input type="hidden" name="decision" value="confirm">
-                                        <button type="submit" class="rounded-lg bg-signal-500 px-4 py-2 text-sm font-semibold text-iron-900 hover:bg-signal-400">
-                                            {{ 'coach.confirm'|trans }}
+                                        <button type="submit"
+                                                aria-label="{{ 'coach.confirm'|trans }}: {{ booking.user.fullName }}, {{ booking.startsAt|format_datetime('medium', 'short', timezone=tz) }}"
+                                                title="{{ 'coach.confirm'|trans }}"
+                                                class="inline-flex items-center rounded-lg bg-signal-500 p-2 text-iron-900 hover:bg-signal-400">
+                                            {% include 'partials/_icon.html.twig' with { name: 'check', class: 'size-5' } %}
                                         </button>
                                     </form>
                                     <form method="post" action="{{ path('coach_booking_respond', {id: booking.id}) }}">
                                         <input type="hidden" name="_token" value="{{ csrf_token('booking') }}">
                                         <input type="hidden" name="decision" value="decline">
-                                        <button type="submit" class="rounded-lg border border-iron-700 px-4 py-2 text-sm font-medium text-iron-100 hover:border-signal-500 hover:text-signal-500">
-                                            {{ 'coach.decline'|trans }}
+                                        <button type="submit"
+                                                aria-label="{{ 'coach.decline'|trans }}: {{ booking.user.fullName }}, {{ booking.startsAt|format_datetime('medium', 'short', timezone=tz) }}"
+                                                title="{{ 'coach.decline'|trans }}"
+                                                class="inline-flex items-center rounded-lg border border-iron-700 p-2 text-iron-100 hover:border-signal-500 hover:text-signal-500">
+                                            {% include 'partials/_icon.html.twig' with { name: 'x', class: 'size-5' } %}
                                         </button>
                                     </form>
                                 </div>

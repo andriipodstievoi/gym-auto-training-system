@@ -3,7 +3,24 @@
 {% set locale = app.request.locale %}
 {% set in_stock = product.totalStock > 0 %}
 
+{#
+   Keyed off the category rather than the product, so a new product in a known
+   section gets the right drawing without anybody editing a map. An unknown
+   section falls back to the barbell rather than to a hole.
+#}
+{% set art = {
+    'protein': 'protein',
+    'creatine': 'creatine',
+    'apparel': 'apparel',
+    'accessories': 'accessory',
+} %}
+{% set art_name = product.category ? (art[product.category.slug]|default('barbell')) : 'barbell' %}
+
 <article class="flex flex-col rounded-xl border border-iron-800 bg-iron-800/40 p-6 transition hover:border-signal-600">
+    <span class="mb-4 inline-flex self-start rounded-lg bg-iron-900/60 p-3 text-signal-500">
+        {% include 'partials/_illustration.html.twig' with { name: art_name, class: 'size-9' } %}
+    </span>
+
     <h3 class="text-lg font-bold text-white">{{ product.name.get(locale) }}</h3>
 
     {% if product.description and not product.description.isEmpty %}

@@ -30,8 +30,11 @@
 
                         <form method="post" action="{{ path('coach_availability_remove', {id: window.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('booking') }}">
-                            <button type="submit" class="rounded-lg border border-iron-700 px-3 py-1.5 text-sm font-medium text-iron-100 hover:border-signal-500 hover:text-signal-500">
-                                {{ 'coach.availability.remove'|trans }}
+                            <button type="submit"
+                                    aria-label="{{ 'coach.availability.remove'|trans }}: {{ ('weekday.' ~ window.weekday)|trans }} {{ window.startTime|date('H:i') }}–{{ window.endTime|date('H:i') }}"
+                                    title="{{ 'coach.availability.remove'|trans }}"
+                                    class="inline-flex items-center rounded-lg border border-iron-700 p-2 text-iron-100 hover:border-signal-500 hover:text-signal-500">
+                                {% include 'partials/_icon.html.twig' with { name: 'trash' } %}
                             </button>
                         </form>
                     </li>

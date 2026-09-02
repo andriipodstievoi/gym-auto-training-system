@@ -37,8 +37,22 @@
                     <img src="{{ asset(product.imagePath) }}" alt="{{ product.name.get(locale) }}"
                          class="w-full rounded-xl border border-iron-800 object-cover">
                 {% else %}
-                    <div class="flex aspect-square items-center justify-center rounded-xl border border-iron-800 bg-iron-800/40">
-                        <span aria-hidden="true" class="text-6xl">🏋️</span>
+                    {#
+                       An emoji renders differently on every platform and is not
+                       the brand's. The drawn mark matches the catalogue tile,
+                       and is keyed off the category the same way.
+                    #}
+                    {% set art = {
+                        'protein': 'protein',
+                        'creatine': 'creatine',
+                        'apparel': 'apparel',
+                        'accessories': 'accessory',
+                    } %}
+                    <div class="flex aspect-square items-center justify-center rounded-xl border border-iron-800 bg-iron-800/40 text-signal-500">
+                        {% include 'partials/_illustration.html.twig' with {
+                            name: product.category ? (art[product.category.slug]|default('barbell')) : 'barbell',
+                            class: 'size-28'
+                        } %}
                     </div>
                 {% endif %}
             </div>

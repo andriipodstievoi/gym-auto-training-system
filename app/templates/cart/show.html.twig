@@ -56,8 +56,11 @@
                                         <input id="{{ field_id }}" name="quantity" type="number" inputmode="numeric"
                                                min="1" max="{{ line.availableStock }}" value="{{ line.quantity }}"
                                                class="w-20 rounded-lg border border-iron-700 bg-iron-900 px-2 py-1.5 text-white">
-                                        <button type="submit" class="rounded-lg border border-iron-600 px-3 py-1.5 text-xs font-semibold text-white hover:border-signal-500 hover:text-signal-500">
-                                            {{ 'shop.cart.update'|trans }}
+                                        <button type="submit"
+                                                aria-label="{{ 'shop.cart.update'|trans }}: {{ line.getName().get(locale) }}"
+                                                title="{{ 'shop.cart.update'|trans }}"
+                                                class="inline-flex items-center rounded-lg border border-iron-600 p-2 text-white hover:border-signal-500 hover:text-signal-500">
+                                            {% include 'partials/_icon.html.twig' with { name: 'refresh' } %}
                                         </button>
                                     </form>
                                 </td>
@@ -66,8 +69,11 @@
                                     <form method="post" action="{{ path('cart_remove') }}">
                                         <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
                                         <input type="hidden" name="key" value="{{ line.key }}">
-                                        <button type="submit" class="text-xs font-semibold text-iron-400 hover:text-signal-500">
-                                            {{ 'shop.cart.remove'|trans }}
+                                        <button type="submit"
+                                                aria-label="{{ 'shop.cart.remove'|trans }}: {{ line.getName().get(locale) }}"
+                                                title="{{ 'shop.cart.remove'|trans }}"
+                                                class="inline-flex items-center rounded-lg p-2 text-iron-400 hover:text-signal-500">
+                                            {% include 'partials/_icon.html.twig' with { name: 'trash' } %}
                                         </button>
                                     </form>
                                 </td>
@@ -94,7 +100,8 @@
                     <form method="post" action="{{ path('shop_checkout_start') }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
                         <button type="submit"
-                                class="rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+                                class="inline-flex items-center gap-2 rounded-lg bg-signal-500 px-6 py-3 font-semibold text-iron-900 hover:bg-signal-400">
+                            {% include 'partials/_icon.html.twig' with { name: 'card', class: 'size-5' } %}
                             {{ 'shop.cart.checkout'|trans }}
                         </button>
                     </form>

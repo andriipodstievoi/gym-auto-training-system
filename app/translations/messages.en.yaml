@@ -338,7 +338,7 @@ shop:
         variant_label: "Option"
         quantity: "Quantity"
         add_to_cart: "Add to cart"
-        from_price: "from %amount%"
+        from_price: "from"
         unavailable: "Unavailable"
     cart:
         title: "Your cart"

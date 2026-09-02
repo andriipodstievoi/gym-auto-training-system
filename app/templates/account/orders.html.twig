@@ -54,8 +54,9 @@
             <div class="mt-6 rounded-xl border border-iron-800 bg-iron-800/40 p-7">
                 <p class="text-iron-200">{{ 'account.orders.empty'|trans }}</p>
                 <a href="{{ path('shop_index') }}"
-                   class="mt-5 inline-block rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
+                   class="mt-5 inline-flex items-center gap-2 rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
                     {{ 'account.orders.view'|trans }}
+                    {% include 'partials/_icon.html.twig' with { name: 'arrow-right', class: 'size-5' } %}
                 </a>
             </div>
         {% endif %}

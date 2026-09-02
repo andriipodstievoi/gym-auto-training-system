@@ -1,0 +1,70 @@
+{#
+   One illustration, by name.
+
+   These are drawn rather than photographed on purpose. A gym site normally
+   leans on stock photography, which would be somebody else's copyright, would
+   not survive a rename of the gym, and would mean shipping a megabyte of JPEG
+   for a protein tub. An inline SVG costs a couple of hundred bytes, stays
+   sharp on any screen, and inherits the palette - so an illustration is still
+   right if the brand colour changes.
+
+   Every shape is decorative. The surrounding card already carries the product
+   or feature name as real text, so the SVG is aria-hidden and contributes
+   nothing to the accessible name. Do not put the only copy of a label in here:
+   an adornment inside a labelled element is exactly what tripped
+   label-content-name-mismatch on the floor plan in M2.
+
+   Usage:
+     {% include 'partials/_illustration.html.twig' with { name: 'protein', class: 'size-16' } %}
+#}
+{% set name = name|default('default') %}
+{% set class = class|default('size-16') %}
+
+<svg class="{{ class }}" viewBox="0 0 64 64" fill="none" stroke="currentColor"
+     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" focusable="false">
+    {% if name == 'protein' %}
+        {# A tub with a scoop line. #}
+        <path d="M18 22h28l-3 30a4 4 0 0 1-4 4H25a4 4 0 0 1-4-4L18 22Z"/>
+        <path d="M16 14h32v8H16z"/>
+        <path d="M26 36h12"/>
+    {% elseif name == 'creatine' %}
+        {# A jar and a measured scoop. #}
+        <path d="M20 24h24v28a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4V24Z"/>
+        <path d="M24 16h16v8H24z"/>
+        <circle cx="32" cy="40" r="6"/>
+    {% elseif name == 'apparel' %}
+        {# A training tee. #}
+        <path d="M24 12 16 18l4 8 4-2v28h16V24l4 2 4-8-8-6-4 4h-8l-4-4Z"/>
+    {% elseif name == 'accessory' %}
+        {# A lifting belt, buckle first. #}
+        <path d="M10 28h44v12H10z"/>
+        <path d="M22 24v20"/>
+        <circle cx="16" cy="34" r="3"/>
+    {% elseif name == 'barbell' %}
+        {# The house mark: a loaded bar. #}
+        <path d="M8 32h48"/>
+        <path d="M14 22v20M20 26v12M44 26v12M50 22v20"/>
+    {% elseif name == 'map' %}
+        <path d="M32 56s16-14 16-26a16 16 0 1 0-32 0c0 12 16 26 16 26Z"/>
+        <circle cx="32" cy="29" r="6"/>
+    {% elseif name == 'membership' %}
+        <path d="M10 18h44v28H10z"/>
+        <path d="M10 28h44"/>
+        <path d="M18 38h10"/>
+    {% elseif name == 'trainer' %}
+        <circle cx="32" cy="22" r="9"/>
+        <path d="M14 54a18 18 0 0 1 36 0"/>
+    {% elseif name == 'plan' %}
+        <path d="M16 10h26l10 10v34a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4Z"/>
+        <path d="M42 10v10h10"/>
+        <path d="M22 34h20M22 42h14"/>
+    {% elseif name == 'shop' %}
+        <path d="M14 20h36l-4 32H18L14 20Z"/>
+        <path d="M24 20a8 8 0 0 1 16 0"/>
+    {% else %}
+        {# Fallback: the bar again, so a typo shows a mark rather than a hole. #}
+        <path d="M8 32h48"/>
+        <path d="M16 24v16M48 24v16"/>
+    {% endif %}
+</svg>

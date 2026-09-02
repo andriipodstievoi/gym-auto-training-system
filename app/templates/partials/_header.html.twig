@@ -13,12 +13,12 @@
 {% set current = app.request.attributes.get('_route') %}
 
 <header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-iron-800 bg-iron-900/90 backdrop-blur">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4">
         <a href="{{ path('home') }}" class="text-2xl font-black tracking-tight text-white">
             {{ 'brand.name'|trans }}<span class="text-signal-500">.</span>
         </a>
 
-        <nav class="hidden items-center gap-7 text-sm font-medium md:flex">
+        <nav class="hidden items-center gap-5 whitespace-nowrap text-sm font-medium lg:flex">
             {% for link in links %}
                 {% set active = current starts with link.prefix %}
                 <a href="{{ path(link.route) }}"
@@ -60,17 +60,12 @@
                 {% if is_coach() %}
                     <a href="{{ path('coach_dashboard') }}"
                        class="{{ current starts with 'coach_' ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
-                       {{ current starts with 'coach_' ? 'aria-current="page"' : '' }}>{{ 'coach.nav.label'|trans }}</a>
+                       {{ current starts with 'coach_' ? 'aria-current="page"' : '' }}>{{ 'coach.kicker'|trans }}</a>
                 {% endif %}
 
-                {# The programme lives under the account, so the two share a
-                   prefix; only one of them should read as the current page. #}
-                {% set on_plans = current starts with 'plan_' or current == 'app_account_plans' %}
-                <a href="{{ path('app_account_plans') }}"
-                   class="{{ on_plans ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
-                   {{ on_plans ? 'aria-current="page"' : '' }}>{{ 'nav.plan'|trans }}</a>
-
-                {% set on_account = current starts with 'app_account' and not on_plans %}
+                {# A programme lives under the account, so viewing one keeps the
+                   Account entry marked as current rather than marking nothing. #}
+                {% set on_account = current starts with 'app_account' or current starts with 'plan_' %}
                 <a href="{{ path('app_account') }}"
                    class="{{ on_account ? 'text-signal-500' : 'text-iron-200 hover:text-white' }}"
                    {{ on_account ? 'aria-current="page"' : '' }}>{{ 'nav.account'|trans }}</a>
@@ -82,7 +77,7 @@
             {% include 'partials/_locale_switcher.html.twig' %}
         </nav>
 
-        <button @click="open = !open" class="text-iron-200 md:hidden" aria-label="{{ 'nav.menu'|trans }}">
+        <button @click="open = !open" class="text-iron-200 lg:hidden" aria-label="{{ 'nav.menu'|trans }}">
             <svg class="size-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path x-show="!open" stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
                 <path x-show="open" x-cloak stroke-linecap="round" d="M6 18 18 6M6 6l12 12"/>
@@ -90,7 +85,7 @@
         </button>
     </div>
 
-    <div x-show="open" x-cloak class="border-t border-iron-800 px-4 py-4 md:hidden">
+    <div x-show="open" x-cloak class="border-t border-iron-800 px-4 py-4 lg:hidden">
         <div class="flex flex-col gap-3 text-sm">
             {% for link in links %}
                 <a href="{{ path(link.route) }}" class="text-iron-100 hover:text-signal-500">{{ ('nav.' ~ link.key)|trans }}</a>
@@ -107,7 +102,7 @@
                     <span aria-hidden="true">{{ 'nav.messages'|trans }}{% if unread_messages() > 0 %} ({{ unread_messages() }}){% endif %}</span>
                 </a>
                 {% if is_coach() %}
-                    <a href="{{ path('coach_dashboard') }}" class="text-iron-100 hover:text-signal-500">{{ 'coach.nav.label'|trans }}</a>
+                    <a href="{{ path('coach_dashboard') }}" class="text-iron-100 hover:text-signal-500">{{ 'coach.kicker'|trans }}</a>
                 {% endif %}
                 <a href="{{ path('app_account_plans') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.plan'|trans }}</a>
                 <a href="{{ path('app_account') }}" class="text-iron-100 hover:text-signal-500">{{ 'nav.account'|trans }}</a>

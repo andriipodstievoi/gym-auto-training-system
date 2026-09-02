@@ -338,7 +338,7 @@ shop:
         variant_label: "Вариант"
         quantity: "Количество"
         add_to_cart: "В корзину"
-        from_price: "от %amount%"
+        from_price: "от"
         unavailable: "Недоступно"
     cart:
         title: "Ваша корзина"

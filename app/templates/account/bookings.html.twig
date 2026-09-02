@@ -54,8 +54,11 @@
                                     {% if booking.isCancellableBy(app.user, now) %}
                                         <form method="post" action="{{ path('booking_cancel', {id: booking.id}) }}">
                                             <input type="hidden" name="_token" value="{{ csrf_token('booking') }}">
-                                            <button type="submit" class="rounded-lg border border-iron-700 px-3 py-1.5 font-medium text-iron-100 hover:border-signal-500 hover:text-signal-500">
-                                                {{ 'account.bookings.cancel'|trans }}
+                                            <button type="submit"
+                                                    aria-label="{{ 'account.bookings.cancel'|trans }}: {{ booking.trainer.fullName }}, {{ booking.startsAt|format_datetime('medium', 'short', timezone=tz) }}"
+                                                    title="{{ 'account.bookings.cancel'|trans }}"
+                                                    class="inline-flex items-center rounded-lg border border-iron-700 p-2 text-iron-100 hover:border-signal-500 hover:text-signal-500">
+                                                {% include 'partials/_icon.html.twig' with { name: 'x' } %}
                                             </button>
                                         </form>
                                     {% endif %}
@@ -69,8 +72,9 @@
             <div class="mt-6 rounded-xl border border-iron-800 bg-iron-800/40 p-7">
                 <p class="text-iron-200">{{ 'account.bookings.empty'|trans }}</p>
                 <a href="{{ path('trainer_index') }}"
-                   class="mt-5 inline-block rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
+                   class="mt-5 inline-flex items-center gap-2 rounded-lg bg-signal-500 px-5 py-2.5 font-semibold text-iron-900 hover:bg-signal-400">
                     {{ 'trainer.profile'|trans }}
+                    {% include 'partials/_icon.html.twig' with { name: 'arrow-right', class: 'size-5' } %}
                 </a>
             </div>
         {% endif %}

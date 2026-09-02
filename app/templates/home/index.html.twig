@@ -19,8 +19,17 @@
         <h2 class="text-2xl font-bold text-white">{{ 'home.features.title'|trans }}</h2>
 
         <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {#
+               The illustration repeats what the heading already says, so it is
+               decorative and stays out of the accessible name - see the note in
+               _illustration.html.twig.
+            #}
+            {% set feature_art = { map: 'map', memberships: 'membership', trainers: 'trainer', shop: 'shop', plan: 'plan' } %}
             {% for key in ['map', 'memberships', 'trainers', 'shop', 'plan'] %}
                 <article class="rounded-xl border border-iron-800 bg-iron-800/40 p-6 transition hover:border-signal-600">
+                    <span class="mb-4 inline-flex rounded-lg bg-iron-900/60 p-3 text-signal-500">
+                        {% include 'partials/_illustration.html.twig' with { name: feature_art[key], class: 'size-8' } %}
+                    </span>
                     <h3 class="text-lg font-bold text-white">{{ ('home.features.' ~ key ~ '.title')|trans }}</h3>
                     <p class="mt-2 text-sm leading-relaxed text-iron-200">{{ ('home.features.' ~ key ~ '.text')|trans }}</p>
                 </article>
