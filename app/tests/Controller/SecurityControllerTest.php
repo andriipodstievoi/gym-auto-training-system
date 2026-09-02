@@ -10,6 +10,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\MailerAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\RawMessage;
 
 /**
  * Registration, sign-in, sign-out and who may reach the back office.
@@ -97,6 +101,54 @@ final class SecurityControllerTest extends WebTestCase
         $client->followRedirect();
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Elza');
+    }
+
+    /**
+     * A dead mail server does not cost somebody their account.
+     *
+     * Reported from the browser: registering with Mailpit stopped returned a
+     * 500 TransportException. The user row had already been flushed by then, so
+     * the member saw a failure, retried, and was told the email was taken -
+     * locked out of an account that existed.
+     *
+     * The mailer is swapped for one that always throws, which is what an SMTP
+     * server being down looks like from inside the application.
+     */
+    public function testRegistrationSurvivesAMailServerThatIsDown(): void
+    {
+        $client = static::createClient();
+
+        // Kept across the redirect, or the container is rebuilt and the real
+        // mailer comes back before the assertion runs.
+        $client->disableReboot();
+        static::getContainer()->set('mailer.mailer', new class implements MailerInterface {
+            public function send(RawMessage $message, ?Envelope $envelope = null): void
+            {
+                throw new TransportException('Connection could not be established.');
+            }
+        });
+
+        $crawler = $client->request('GET', '/en/register');
+        self::assertResponseIsSuccessful();
+
+        $client->submit($crawler->selectButton('Create account')->form([
+            'registration_form[firstName]' => 'Ilona',
+            'registration_form[lastName]' => 'Krastina',
+            'registration_form[email]' => 'ilona'.self::SCRATCH_DOMAIN,
+            'registration_form[plainPassword][first]' => 'kettlebell-swing-42',
+            'registration_form[plainPassword][second]' => 'kettlebell-swing-42',
+        ]));
+
+        // The registration completes. Losing the welcome mail is a nuisance;
+        // losing the account is not recoverable by the member.
+        self::assertResponseRedirects('/en/account');
+
+        $user = self::userRepository()->findOneByEmail('ilona'.self::SCRATCH_DOMAIN);
+        self::assertInstanceOf(User::class, $user);
+
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Ilona');
     }
 
     public function testRegistrationRefusesAnEmailThatIsAlreadyTaken(): void
