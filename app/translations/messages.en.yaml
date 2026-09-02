@@ -558,3 +558,6 @@ plan:
         body: "This is not a refusal. Bring us clearance and our trainers will build around whatever you need."
         flags: "What you flagged"
         contact: "Talk to a trainer"
+
+a11y:
+    skip_to_content: "Skip to content"

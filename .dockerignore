@@ -1,0 +1,38 @@
+# The build context for infra/php/Dockerfile is the repository root, and the
+# repository root is 477 MB. Almost none of it belongs in the image:
+# app/vendor is reinstalled by composer inside the build, ai-service/.venv is a
+# Windows virtualenv that would not run on Linux anyway, and app/var is cache,
+# logs and a 107 MB Tailwind binary.
+#
+# Without this file every build ships all of it to the daemon before the first
+# instruction runs.
+
+.git
+.github
+.gitattributes
+.gitignore
+
+# Reinstalled inside the image by composer.
+app/vendor
+app/node_modules
+
+# Cache, logs, the downloaded Tailwind binary, and coverage reports.
+app/var
+
+# Downloaded by importmap:install during composer's post-install hook.
+app/assets/vendor
+
+# A Windows virtualenv. The ai-service image builds its own.
+ai-service/.venv
+ai-service/**/__pycache__
+ai-service/.pytest_cache
+ai-service/.ruff_cache
+
+# Local overrides must never reach an image - they are where real keys live.
+app/.env.local
+app/.env.*.local
+
+# Documentation and screenshots are for people reading the repository.
+docs
+*.md
+LICENSE

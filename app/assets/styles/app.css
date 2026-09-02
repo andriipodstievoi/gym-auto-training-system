@@ -83,3 +83,69 @@
 
 .leaflet-bar a:hover { background: var(--color-iron-600); color: #fff; }
 .leaflet-control-attribution a { color: var(--color-signal-500); }
+
+/*
+   A focus ring that is actually visible on a dark background.
+
+   Browsers draw their default ring in the system accent colour, which on this
+   palette lands somewhere between invisible and nearly invisible. Anybody
+   navigating by keyboard needs to see where they are, and :focus-visible keeps
+   it off mouse clicks so it costs pointer users nothing.
+*/
+:focus-visible {
+    outline: 2px solid var(--color-signal-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* The skip link's target should not draw a ring around the whole page. */
+main:focus,
+main:focus-visible {
+    outline: none;
+}
+
+/*
+   Printing a programme.
+
+   A training plan is the one page on this site somebody genuinely wants on
+   paper - taped inside a gym bag, not read on a phone between sets. Printed
+   from the screen styles it comes out as dark grey ink on white with the
+   navigation and buttons in the way, so this strips it to the table.
+*/
+@media print {
+    header,
+    footer,
+    nav,
+    form,
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    main :is(h1, h2, h3, p, td, th, li, span, strong) {
+        color: #000 !important;
+    }
+
+    main :is(article, section, table, div) {
+        background: transparent !important;
+        border-color: #999 !important;
+    }
+
+    /* A week should not be split across a page break mid-day. */
+    main table {
+        page-break-inside: avoid;
+        width: 100%;
+    }
+
+    main h2 {
+        page-break-after: avoid;
+    }
+
+    a[href]::after {
+        content: "";
+    }
+}

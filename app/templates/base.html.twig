@@ -16,9 +16,21 @@
         {% endblock %}
     </head>
     <body class="h-full bg-iron-900 text-iron-100 antialiased">
+        {#
+           The first thing a keyboard reaches on every page. Without it, getting
+           to the content past a twelve-item header costs a dozen tab presses on
+           every single navigation - which is most of what using this site by
+           keyboard would be. It is off-screen until focused.
+        #}
+        <a href="#content"
+           class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-signal-500 focus:px-4 focus:py-2 focus:font-semibold focus:text-iron-900">
+            {{ 'a11y.skip_to_content'|trans }}
+        </a>
+
         {% block header %}{% include 'partials/_header.html.twig' %}{% endblock %}
 
-        <main>{% block body %}{% endblock %}</main>
+        {# tabindex="-1" so the skip link can actually move focus here. #}
+        <main id="content" tabindex="-1">{% block body %}{% endblock %}</main>
 
         {% block footer %}{% include 'partials/_footer.html.twig' %}{% endblock %}
     </body>
