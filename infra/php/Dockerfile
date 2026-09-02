@@ -24,11 +24,26 @@ ENV APP_ENV=prod \
 # --no-dev matters: without it the image ships phpunit, phpstan, php-cs-fixer
 # and web-profiler-bundle. That is both a much larger image and a debug
 # toolbar in production.
+#
+# INSTALL_DEV=1 is the one exception, used by the seed service in
+# compose.yaml. doctrine-fixtures-bundle is a dev dependency and is registered
+# for dev and test only, so loading demo data needs an image that has it -
+# which is precisely the image that must not be the one serving traffic.
+ARG INSTALL_DEV=0
+
 COPY app/composer.json app/composer.lock app/symfony.lock ./
-RUN composer install --no-interaction --no-scripts --no-autoloader --prefer-dist --no-dev
+RUN if [ "$INSTALL_DEV" = "1" ]; then \
+        composer install --no-interaction --no-scripts --no-autoloader --prefer-dist; \
+    else \
+        composer install --no-interaction --no-scripts --no-autoloader --prefer-dist --no-dev; \
+    fi
 
 COPY app/ ./
-RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
+RUN if [ "$INSTALL_DEV" = "1" ]; then \
+        composer dump-autoload --optimize --classmap-authoritative; \
+    else \
+        composer dump-autoload --optimize --classmap-authoritative --no-dev; \
+    fi
 
 # The stylesheet has to be built inside the image.
 #

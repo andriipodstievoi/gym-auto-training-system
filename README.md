@@ -97,7 +97,14 @@ loads. The site produces valid programmes with no API key configured.
 ### With Docker (any machine)
 
 ```bash
-docker compose -f infra/compose.yaml up --build
+docker compose -f infra/compose.yaml up --build -d
+```
+
+Then create the schema and load the demo data. This is a separate, opt-in
+service rather than part of `up`:
+
+```bash
+docker compose -f infra/compose.yaml --profile seed run --rm seed
 ```
 
 | Service | URL |
@@ -107,6 +114,28 @@ docker compose -f infra/compose.yaml up --build
 | Mailpit | http://localhost:8026 |
 
 Host ports are offset so the stack coexists with a local Laragon install.
+
+**The image that serves traffic is a production image.** It is built
+`--no-dev`, so it carries no PHPUnit, PHPStan or web profiler, and `APP_ENV` is
+pinned to `prod`. It also builds the stylesheet during the build —
+AssetMapper compiles on the fly in dev, so without that step a container serves
+a correctly-working but completely unstyled site.
+
+That is also why seeding is its own service. `doctrine-fixtures-bundle` is a
+development dependency and is registered for `dev` and `test` only, so loading
+demo data needs an image that has it — which is exactly the image that should
+not be answering requests. The `seed` profile builds that image, runs
+migrations and fixtures, and exits.
+
+**No bind mounts of `app/`.** An earlier version mounted the source over
+`/var/www/app`, which hid both the vendor directory the image installs and the
+assets it compiles; it appeared to work only on a machine that happened to have
+a local `vendor/`. `nginx` and `php` now share one named volume holding
+`public/`, populated from the image.
+
+`APP_SECRET` is read from the environment. The value committed in `app/.env` is
+a development default that has been public since M3 and must not be reused for
+anything real.
 
 ### Natively (Windows + Laragon)
 

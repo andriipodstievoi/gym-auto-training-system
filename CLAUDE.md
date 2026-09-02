@@ -215,6 +215,20 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   green on the server. Inject a `MockHttpClient` that refuses the connection instead; the suite now
   gives the same result with the service up or down, and both are checked.
 
+- **A Docker image that only ever gets built is not a Docker image that works.** CI built these
+  two for seven milestones and never ran them, which hid three faults at once: no `--no-dev`, so
+  the image shipped the web profiler; no `tailwind:build`, so it served an unstyled site; and a
+  compose bind mount of `app/` over `/var/www/app` that hid both. Run the stack, do not just
+  build it.
+- **Docker Desktop on Windows 11 Home needs its WSL distribution provisioned.** The engine answers
+  `500 Internal Server Error` on every API route until `wsl -l -v` lists `docker-desktop`. There is
+  no Hyper-V fallback on Home.
+- **The Symfony CLI web server probes Docker on every request.** While the daemon is starting and
+  answering 500s, that probe blocks: pages went from 250 ms to 113-196 seconds, while a bare PHP
+  boot stayed at 0.09 s. `SYMFONY_SKIP_DOCKER_COMPOSE=1` on `server:start` removes it.
+- Unlike the Laragon services, **the compose stack survives a session ending** - it is still up
+  hours later. If MySQL is refusing connections, check which one you are talking to.
+
 
 ## Status
 
@@ -270,6 +284,19 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   a live-key run is Andrii's alone.
 - Fixtures seed `admin@speks.lv`, `member@speks.lv` and `prospect@speks.lv`, all with
   password `speks-dev`.
+
+### Running in Docker (verified)
+
+- `docker compose -f infra/compose.yaml up --build -d` then
+  `docker compose -f infra/compose.yaml --profile seed run --rm seed`.
+- The serving image is production-shaped: `--no-dev`, `APP_ENV=prod`, and the stylesheet compiled
+  into it by `tailwind:build --minify` and `asset-map:compile`. Verified in a browser: the CSS
+  loads from a digested URL, the body paints iron-900, and there is no debug toolbar.
+- Seeding is a separate opt-in image built with `INSTALL_DEV=1`, because the fixtures bundle is a
+  dev dependency registered for dev and test only. Nothing serves traffic from it.
+- The two runtimes talk over the compose network: Symfony reaches the generator at
+  `http://ai-service:8001`, and a full assessment through the stack returns a real plan
+  (Upper / Lower, engine 1.0.0, five weeks) and a 52 KB PDF.
 
 ### Illustrations and icons (M8)
 
