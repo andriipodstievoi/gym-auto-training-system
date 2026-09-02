@@ -32,12 +32,31 @@
             <directory>src</directory>
         </include>
 
+        <exclude>
+            <!-- Framework plumbing and seed data, not logic this project owns. -->
+            <file>src/Kernel.php</file>
+            <directory>src/DataFixtures</directory>
+        </exclude>
+
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>
             <method>Doctrine\Deprecations\Deprecation::delegateTriggerToBackend</method>
             <function>trigger_deprecation</function>
         </deprecationTrigger>
     </source>
+
+    <!--
+       Coverage was off through M0 to M6 so the suite stayed fast while the
+       shape of the app was still moving. It is on in CI now, so a drop shows
+       up in the diff rather than months later.
+
+       The reports are asked for on the command line rather than configured
+       here on purpose: naming a report element makes a coverage driver
+       mandatory, and a plain "bin/phpunit" on a machine without xdebug then
+       exits with "No tests executed" instead of running the suite. What the
+       source element above includes and excludes still governs what gets
+       measured. See the CI workflow for the exact invocation.
+    -->
 
     <extensions>
     </extensions>

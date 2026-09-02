@@ -30,6 +30,14 @@ in isolation and independently deployable. The Symfony app owns the questionnair
 persistence, payments and everything a member sees. See
 [ADR 0001](docs/adr/0001-two-runtimes.md).
 
+**The decisions worth reading before changing anything:**
+
+| ADR | Decision |
+|---|---|
+| [0001](docs/adr/0001-two-runtimes.md) | The training-plan generator is a separate Python service |
+| [0002](docs/adr/0002-only-the-webhook-confirms-money.md) | Only a signed webhook may confirm a payment |
+| [0003](docs/adr/0003-snapshot-what-was-bought.md) | A purchase snapshots what it was, not what it points at |
+
 **Why the rule engine comes first.** The generator computes every number
 deterministically. The LLM layer only writes prose on top — coaching cues,
 warm-ups, weekly focus, in the member's language. It never changes sets, reps or
@@ -64,7 +72,8 @@ loads. The site produces valid programmes with no API key configured.
 | **M4** | Shop — catalogue, cart, orders | ✅ done |
 | **M5** | Trainers, availability, booking, messaging | ✅ done |
 | **M6** | Assessment, rule engine, LLM layer, PDF export | ✅ done |
-| M7 | Coverage, docs, screenshots | planned |
+| M7 | Coverage, docs, screenshots | in progress |
+| **M8** | Illustrations and icons | ✅ done |
 
 ---
 
@@ -203,6 +212,15 @@ The repository tests need a seeded test database:
 
 ```bash
 cd app && php bin/console doctrine:migrations:migrate --env=test --no-interaction && php bin/console doctrine:fixtures:load --env=test --no-interaction
+```
+
+Coverage is measured in CI and can be run locally. It needs `xdebug`, which is
+why it is asked for on the command line rather than switched on in
+`phpunit.dist.xml` — a plain `bin/phpunit` has to keep working on a machine
+without a coverage driver:
+
+```bash
+cd app && XDEBUG_MODE=coverage bin/phpunit --coverage-text --coverage-html var/coverage
 ```
 
 ```bash

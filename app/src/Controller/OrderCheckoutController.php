@@ -110,6 +110,14 @@ final class OrderCheckoutController extends AbstractController
 
         if (null === $session->url) {
             $logger->error('Stripe returned a checkout session with no URL.', ['session' => $session->id]);
+
+            // Same failure as the catch above, so the same cleanup: nothing was
+            // charged and there is nowhere to send the member, so the order must
+            // not sit PENDING in their account for ever. The cancel route is the
+            // only other thing that clears it, and they never reach it.
+            $entityManager->remove($order);
+            $entityManager->flush();
+
             $this->addFlash('error', 'shop.flash.checkout_failed');
 
             return $this->redirectToRoute('cart_show');

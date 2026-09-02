@@ -107,6 +107,15 @@ cd app && bin/phpunit
 cd ai-service && .venv/Scripts/python.exe -m ruff check . && .venv/Scripts/python.exe -m pytest -q
 ```
 
+Coverage runs in CI and locally, but is requested on the command line rather than
+configured in `phpunit.dist.xml`. Naming a `<report>` there makes a coverage driver
+mandatory, and a plain `bin/phpunit` on a machine without xdebug then exits with
+"No tests executed" instead of running the suite:
+
+```bash
+cd app && XDEBUG_MODE=coverage bin/phpunit --coverage-text --coverage-html var/coverage
+```
+
 PHPStan is at **level 8** and must stay there. The PHPStan step needs a warmed dev cache
 because the Symfony extension reads the compiled container.
 
@@ -218,7 +227,8 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 | M4 | Shop — catalogue, cart, orders | done |
 | M5 | Trainers, availability, booking, messaging | done |
 | M6 | Assessment, rule engine, LLM layer, PDF export | done |
-| M7 | Coverage, docs, screenshots | **next** |
+| M7 | Coverage, docs, screenshots | **in progress** |
+| M8 | Illustrations and icons | done |
 
 ### Decisions already made
 
@@ -260,6 +270,28 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
   a live-key run is Andrii's alone.
 - Fixtures seed `admin@speks.lv`, `member@speks.lv` and `prospect@speks.lv`, all with
   password `speks-dev`.
+
+### Illustrations and icons (M8)
+
+- **The artwork is drawn, not photographed.** `templates/partials/_illustration.html.twig` holds
+  every mark. Stock photography would be somebody else's copyright, would not survive the gym
+  being renamed, and would mean shipping a megabyte of JPEG for a protein tub. An inline SVG is a
+  couple of hundred bytes, stays sharp at any size, and inherits `currentColor` - so the artwork is
+  still right if the brand colour changes.
+- **No invented photographs of people.** Trainer cards carry a drawn mark. The fixtures describe
+  coaches who do not exist, and generating portraits of them would be worse than having none.
+- **Illustrations are decorative; icons are not.** The two live in separate partials because the
+  difference is an accessibility one. An illustration sits on a card that already names itself, so
+  it is `aria-hidden`. An icon sits inside a control, and **an icon is never an accessible name** -
+  every icon-only button carries an `aria-label`, and where the action repeats down a list the
+  label names the row ("Remove: Leather lifting belt"), because "Remove" eleven times tells a
+  screen-reader user nothing.
+- Product artwork is keyed off the **category**, not the product, so a new item in a known section
+  gets the right drawing without anybody editing a map. An unknown section falls back to the
+  barbell rather than to a hole.
+- The header moved from `md:` to `lg:` for its desktop nav. A signed-out visitor sees seven items
+  and they fit; a signed-in coach sees twelve, and at `md` the bar wrapped and the wordmark
+  collided with the first link.
 
 ### The training-plan generator (M6)
 

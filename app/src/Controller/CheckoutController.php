@@ -101,6 +101,13 @@ final class CheckoutController extends AbstractController
 
         if (null === $session->url) {
             $logger->error('Stripe returned a checkout session with no URL.', ['session' => $session->id]);
+
+            // Same failure as the catch above, so the same cleanup: nothing was
+            // charged and there is nowhere to send the member, so the membership
+            // must not sit PENDING in their account for ever.
+            $entityManager->remove($membership);
+            $entityManager->flush();
+
             $this->addFlash('error', 'membership.flash.checkout_failed');
 
             return $this->redirectToRoute('membership_index');

@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use UnexpectedValueException;
 
 /**
@@ -85,6 +86,28 @@ final class StripeWebhookController extends AbstractController
                 : $this->expireMembership($object, $memberships, $entityManager),
             default => new Response('Ignored.', Response::HTTP_OK),
         };
+    }
+
+    /**
+     * Send a confirmation without letting it undo the confirmation.
+     *
+     * The row is already flushed by the time this runs, which is the right
+     * order - money arriving is the fact worth keeping. But a mailer that
+     * throws here would hand Stripe a 500, and Stripe's retry would find a row
+     * that is no longer PENDING and answer "Already handled", so the member
+     * would never get the mail at all. Losing the mail and saying so in the log
+     * is the better of the two failures.
+     */
+    private function sendQuietly(callable $send, LoggerInterface $logger, string $what): void
+    {
+        try {
+            $send();
+        } catch (TransportExceptionInterface $e) {
+            $logger->error('A payment was confirmed but its mail could not be sent.', [
+                'exception' => $e,
+                'subject' => $what,
+            ]);
+        }
     }
 
     /**
@@ -153,7 +176,7 @@ final class StripeWebhookController extends AbstractController
         $this->drawDownStock($order);
         $entityManager->flush();
 
-        $mailer->sendOrderConfirmation($order);
+        $this->sendQuietly(static fn () => $mailer->sendOrderConfirmation($order), $logger, 'order receipt');
 
         return new Response('Confirmed.', Response::HTTP_OK);
     }
@@ -241,7 +264,7 @@ final class StripeWebhookController extends AbstractController
         $membership->activate(new DateTimeImmutable());
         $entityManager->flush();
 
-        $mailer->sendMembershipConfirmation($membership);
+        $this->sendQuietly(static fn () => $mailer->sendMembershipConfirmation($membership), $logger, 'membership confirmation');
 
         return new Response('Confirmed.', Response::HTTP_OK);
     }

@@ -43,7 +43,7 @@ jobs:
         with:
           php-version: '8.3'
           extensions: intl, zip, pdo_mysql, redis, apcu, opcache
-          coverage: none
+          coverage: xdebug
           tools: composer:v2
 
       - name: Cache Composer packages
@@ -86,7 +86,9 @@ jobs:
           bin/console doctrine:fixtures:load --env=test --no-interaction
 
       - name: Tests
-        run: bin/phpunit
+        run: bin/phpunit --coverage-text --coverage-clover=var/coverage/clover.xml
+        env:
+          XDEBUG_MODE: coverage
 
   python:
     name: Python · ai-service
