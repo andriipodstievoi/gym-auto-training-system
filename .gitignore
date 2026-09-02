@@ -27,6 +27,13 @@ __pycache__/
 *.local.env
 !/.env.example
 
+# Production deployment values. infra/deploy/.env.prod is where APP_SECRET,
+# the database password and any live Stripe or Anthropic keys live on the
+# server; .env.prod.local is the throwaway file the local smoke test in
+# docs/DEPLOY.md uses. Only the example is committed.
+/infra/deploy/.env.prod*
+!/infra/deploy/.env.prod.example
+
 # --- Editors / OS ---
 .idea/
 .vscode/

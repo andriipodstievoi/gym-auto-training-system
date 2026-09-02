@@ -32,6 +32,12 @@ ai-service/.ruff_cache
 app/.env.local
 app/.env.*.local
 
+# Production values are injected as environment variables at run time. Nothing
+# copies them into an image, but there is no reason to hand them to the daemon
+# as build context either.
+infra/deploy/.env.prod*
+!infra/deploy/.env.prod.example
+
 # Documentation and screenshots are for people reading the repository.
 docs
 *.md

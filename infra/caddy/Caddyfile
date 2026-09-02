@@ -1,0 +1,67 @@
+# The only process on the VM that listens on the public internet.
+#
+# Caddy terminates TLS and forwards to nginx over the internal compose
+# network. It could speak FastCGI to php-fpm directly and save a container,
+# but infra/nginx/default.conf is the configuration this application has
+# actually been served through and verified against - the front-controller
+# guard that makes every other .php a 404, the digested AssetMapper paths, the
+# gzip types, the 12 MB body limit. Rewriting all of that in Caddyfile syntax
+# to save about 10 MB of RSS would mean the production path differed from the
+# verified one in precisely the layer that decides what gets served. Caddy's
+# job here is TLS, and nothing else.
+#
+# Certificates are automatic. For a public name Caddy solves an ACME challenge
+# against Let's Encrypt on first request and renews on its own; for localhost,
+# a *.localhost name, a bare IP or a .local name it uses its own internal CA
+# and never contacts anybody. That is what makes a local smoke test possible
+# without touching the rate limits - see docs/DEPLOY.md.
+
+{
+	# Where Let's Encrypt sends expiry warnings, and the contact on the ACME
+	# account. Required, not because Caddy needs an account contact - it will
+	# register without one - but because this directive takes an argument and
+	# an empty ACME_EMAIL is a parse error rather than an omission:
+	#
+	#     parsing caddyfile tokens for 'email': wrong argument count
+	#
+	# which presents as Caddy restarting in a loop and the site never
+	# answering. infra/deploy/provision.sh refuses to write an env file
+	# without it.
+	email {$ACME_EMAIL}
+
+	# Uncomment while getting DNS or firewall rules wrong. The staging CA has
+	# far higher rate limits and issues certificates no browser trusts, which
+	# is exactly what you want until the challenge actually completes.
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+{$SITE_DOMAIN} {
+	# Empty in production. Set CADDY_TLS_POLICY to "tls internal" to force the
+	# internal CA for a hostname Caddy would otherwise try to get a public
+	# certificate for.
+	{$CADDY_TLS_POLICY}
+
+	encode zstd gzip
+
+	header {
+		# Six months, and only meaningful once the domain is definitely
+		# staying on HTTPS - a browser that has seen this header will refuse
+		# to talk to the site over http until it expires.
+		Strict-Transport-Security "max-age=15552000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Caddy adds X-Forwarded-For, X-Forwarded-Proto and X-Forwarded-Host on its
+	# own. nginx passes request headers through to php-fpm as HTTP_* FastCGI
+	# parameters without any extra configuration, so Symfony sees them - which
+	# is the half of the arrangement that TRUSTED_PROXIES makes usable.
+	reverse_proxy nginx:80
+
+	log {
+		output stdout
+		format json
+	}
+}

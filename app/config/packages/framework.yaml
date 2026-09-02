@@ -3,6 +3,17 @@ framework:
     default_locale: '%env(DEFAULT_LOCALE)%'
     enabled_locales: ['en', 'lv', 'ru']
 
+    # Behind a reverse proxy - Caddy in production, see infra/compose.prod.yaml -
+    # Symfony has to be told which peers are allowed to set X-Forwarded-*.
+    # Without it the request that reaches PHP looks like plain http from a
+    # container address, so `cookie_secure: auto` below issues the session
+    # cookie without the Secure flag and every generated absolute URL says
+    # http. TRUSTED_PROXIES is empty in app/.env, so nothing changes for the
+    # dev stack, the Symfony CLI server or the test suite, none of which have
+    # a proxy in front of them.
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
+
     session:
         # Sessions live in Redis so the app stays stateless behind a load balancer.
         handler_id: '%env(REDIS_URL)%'
