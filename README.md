@@ -13,6 +13,21 @@ Served in **English, Latvian and Russian**, priced in EUR.
 
 ---
 
+## What it looks like
+
+Captured from the running site with seeded data, at 1280px. Every page is
+served in English, Latvian and Russian.
+
+| | |
+|---|---|
+| ![Home](docs/screenshots/01-home.png)<br>**Home** — the milestone tracker is Alpine-driven | ![Branch map](docs/screenshots/02-branch-map.png)<br>**Branches** — Leaflet over OpenStreetMap |
+| ![Floor plan](docs/screenshots/03-floor-plan.png)<br>**Floor plan** — generated from data, not drawn | ![Shop](docs/screenshots/04-shop.png)<br>**Shop** — catalogue with drawn artwork |
+| ![Memberships](docs/screenshots/05-memberships.png)<br>**Memberships** — priced in EUR, checkout off without keys | ![Assessment](docs/screenshots/06-assessment.png)<br>**Assessment** — twelve questions, works without JavaScript |
+| ![Training plan](docs/screenshots/07-plan.png)<br>**Programme** — every number from the rule engine | ![Booking](docs/screenshots/08-booking.png)<br>**Booking** — slots from a coach's weekly hours |
+| ![Coach area](docs/screenshots/09-coach.png)<br>**Coach** — confirm or decline a request | ![Back office](docs/screenshots/10-admin.png)<br>**Admin** — EasyAdmin 5, per-locale fields |
+
+---
+
 ## Architecture
 
 Two runtimes, one repository:
@@ -72,7 +87,7 @@ loads. The site produces valid programmes with no API key configured.
 | **M4** | Shop — catalogue, cart, orders | ✅ done |
 | **M5** | Trainers, availability, booking, messaging | ✅ done |
 | **M6** | Assessment, rule engine, LLM layer, PDF export | ✅ done |
-| M7 | Coverage, docs, screenshots | in progress |
+| **M7** | Coverage, docs, screenshots | ✅ done |
 | **M8** | Illustrations and icons | ✅ done |
 
 ---

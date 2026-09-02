@@ -227,7 +227,7 @@ cd app && php bin/console doctrine:migrations:migrate --env=test --no-interactio
 | M4 | Shop — catalogue, cart, orders | done |
 | M5 | Trainers, availability, booking, messaging | done |
 | M6 | Assessment, rule engine, LLM layer, PDF export | done |
-| M7 | Coverage, docs, screenshots | **in progress** |
+| M7 | Coverage, docs, screenshots | done |
 | M8 | Illustrations and icons | done |
 
 ### Decisions already made

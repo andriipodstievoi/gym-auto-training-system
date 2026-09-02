@@ -48,7 +48,7 @@ final class HomeController extends AbstractController
             'detail' => 'Coach profiles, availability, session booking and messaging with email notifications.'],
         ['id' => 'M6', 'title' => 'Automatic training system', 'done' => true,
             'detail' => 'The assessment, the Python rule engine, the LLM coaching layer and PDF plan export.'],
-        ['id' => 'M7', 'title' => 'Hardening', 'done' => false,
+        ['id' => 'M7', 'title' => 'Hardening', 'done' => true,
             'detail' => 'PHPUnit and pytest coverage, PHPStan level up, documentation and screenshots.'],
         ['id' => 'M8', 'title' => 'Illustrations & icons', 'done' => true,
             'detail' => 'Drawn SVG artwork across the site, and icons on the controls that earn them.'],
